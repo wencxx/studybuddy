@@ -34,7 +34,7 @@
                         <span class="text-xl">Marketplace</span>
                     </router-link>
                 </li>
-                <button @click="signOut" class="bg-blue-500 rounded mt-6 py-1 hover:bg-blue-500/95">Sign out</button>
+                <button @click="signout" class="bg-blue-500 rounded mt-6 py-1 hover:bg-blue-500/95">Sign out</button>
             </ul>
           </nav>  
         </div>
