@@ -100,18 +100,15 @@ const getMessages = () => {
         });
 
         const updateMessages = (newMessages) => {
-            // Combine existing messages with the new ones
             const allMessages = [...messages.value, ...newMessages];
             const uniqueMessagesMap = new Map();
 
-            // Create a unique set of messages based on their IDs
             allMessages.forEach(message => {
                 uniqueMessagesMap.set(message.id, message);
             });
 
-            // Convert the map to an array and sort by 'messageAt' timestamp
             messages.value = Array.from(uniqueMessagesMap.values())
-                .sort((a, b) => b.messageAt.toMillis() - a.messageAt.toMillis()); // Adjust sorting as necessary
+                .sort((a, b) => b.messageAt.toMillis() - a.messageAt.toMillis());
         };
 
         onUnmounted(() => {

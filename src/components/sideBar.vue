@@ -4,25 +4,25 @@
             <ul class="flex flex-col gap-y-2">
                 <li>
                     <router-link :to="{ name: 'newsfeed' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
-                        <Icon icon="mingcute:home-3-fill" size="30" />
+                        <Icon icon="mingcute:home-3-fill" class="text-2xl" />
                         <span class="text-xl">Home</span>
                     </router-link>
                 </li>
                 <li>
                     <router-link :to="{ name: 'tasks' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
-                        <Icon icon="mingcute:task-2-fill" size="30" />
+                        <Icon icon="mingcute:task-2-fill" class="text-2xl" />
                         <span class="text-xl">Tasks</span>
                     </router-link>
                 </li>
                 <li>
                     <router-link  :to="{ name: 'notes' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
-                        <Icon icon="material-symbols:event-note" size="30" />
+                        <Icon icon="material-symbols:event-note" class="text-2xl" />
                         <span class="text-xl">Notes</span>
                     </router-link>
                 </li>
                 <li>
                     <router-link to="/" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
-                        <Icon icon="ion:storefront" size="30" />
+                        <Icon icon="ion:storefront" class="text-2xl" />
                         <span class="text-xl">Marketplace</span>
                     </router-link>
                 </li>
