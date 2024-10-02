@@ -1,6 +1,6 @@
 <template>
   <div class="absolute top-0 left-0 h-[100dvh] w-full bg-black/35 flex items-center justify-center">
-    <form @submit.prevent="post" class="bg-gray-100 dark:bg-gray-900 w-1/4 h-fit rounded-xl border border-gray-100/10 p-5 flex flex-col gap-y-5">
+    <form @submit.prevent="post" class="bg-gray-100 dark:bg-gray-900 w-3/4 md:w-2/4 xl:w-1/4 h-fit rounded-xl border border-gray-100/10 p-5 flex flex-col gap-y-5">
       <!-- modal header -->
       <div class="flex items-center justify-between">
         <h2>Add new note</h2>
