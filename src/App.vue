@@ -6,11 +6,39 @@
           <h1 class="text-xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
         </div>
         <!-- nav -->
-        <nav>
-
-        </nav>
+        <div class="flex lg:hidden items-center">
+          <Icon :icon="iconType" class="text-3xl cursor-pointer" @click="toggleSidebar" />
+          <nav class="h-[93dvh] w-0 overflow-hidden bg-gray-900 absolute border-r border-gray-100/10 left-0 top-[7dvh] flex flex-col gap-y-2 duration-150" :class="{ '!p-4 !w-2/3': showSidebar }">
+            <ul class="hidden flex-col gap-y-2" :class="{ '!flex': showSidebar }">
+                <li>
+                    <router-link :to="{ name: 'newsfeed' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="mingcute:home-3-fill" class="text-3xl" />
+                        <span class="text-xl">Home</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link :to="{ name: 'tasks' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="mingcute:task-2-fill" class="text-3xl" />
+                        <span class="text-xl">Tasks</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link  :to="{ name: 'notes' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="material-symbols:event-note" class="text-3xl" />
+                        <span class="text-xl">Notes</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="ion:storefront" class="text-3xl" />
+                        <span class="text-xl">Marketplace</span>
+                    </router-link>
+                </li>
+            </ul>
+          </nav>  
+        </div>
         <!-- profile -->
-        <div class="flex items-center gap-x-2">
+        <div class="hidden lg:flex items-center gap-x-2">
           <div class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
             <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block">
             <Icon icon="mynaui:search" class="text-gray-300 dark:text-white text-2xl" />
@@ -61,6 +89,20 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const currentUser = ref(null)
+
+const iconType = ref('eva:menu-fill')
+const showSidebar = ref(false)
+
+const toggleSidebar = () => {
+  showSidebar.value = !showSidebar.value
+
+  if(showSidebar.value){
+    iconType.value = 'iconamoon:close-duotone'
+    return 
+  }
+
+  iconType.value = 'eva:menu-fill'
+}
 
 onAuthStateChanged(auth, (user) => {
   if(user){
@@ -132,3 +174,10 @@ const toggleDarkmode = () => {
   document.documentElement.classList.toggle('dark')
 }
 </script>
+
+<style scoped>
+.router-link-active {
+    background-color: #2563eb;
+    color: white;
+}
+</style>
