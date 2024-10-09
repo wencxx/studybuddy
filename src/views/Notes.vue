@@ -50,17 +50,19 @@ onMounted(() => {
 
 // get real time notes
 const getNotes = () => {
-    const notesQuery = query(
-        collection(db, 'notes'),
-        where('userId', '==', userId),
-        orderBy('addedAt', 'desc')
-    );
+    if(userId){
+        const notesQuery = query(
+            collection(db, 'notes'),
+            where('userId', '==', userId),
+            orderBy('addedAt', 'desc')
+        );
 
-    onSnapshot(notesQuery, (snapshot) => {
-        notes.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }, (error) => {
-        console.error("Error fetching notes: ", error); 
-    });
+        onSnapshot(notesQuery, (snapshot) => {
+            notes.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }, (error) => {
+            console.error("Error fetching notes: ", error); 
+        });
+    }
 }
 
 const formatDate = (firestoreTimestamp) => {

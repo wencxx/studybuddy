@@ -4,11 +4,11 @@
       <!-- modal header -->
       <div class="flex items-center justify-between">
         <h2>Add new post</h2>
-        <Icon icon="ic:baseline-close" size="22" class="cursor-pointer" @click="closeModal" />
+        <Icon icon="ic:baseline-close" class="cursor-pointer text-xl" @click="closeModal" />
       </div>
       <!-- modal body -->
       <div>
-        <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="postDetails"></textarea>
+        <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="postDetails" autofocus></textarea>
         <!-- add media -->
         <div class="flex">
           <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addImage" />
@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, ref } from 'vue'
+import { computed, defineEmits, onMounted, ref } from 'vue'
 import { db } from '../plugins/firebase'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { useAuthStore } from '../store'

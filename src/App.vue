@@ -3,11 +3,13 @@
       <header class="flex items-center justify-between h-[7dvh] w-full bg-white/0 sticky top-0 backdrop-blur border-b border-gray-100 dark:border-gray-100/10 px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] z-20">
         <!-- logo -->
         <div>
-          <h1 class="text-xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
+          <router-link :to="{ name: 'newsfeed' }">
+            <h1 class="text-xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
+          </router-link>
         </div>
         <!-- nav -->
         <div class="flex lg:hidden items-center">
-          <Icon :icon="iconType" class="text-3xl cursor-pointer" @click="toggleSidebar" />
+          <Icon :icon="iconType" class="text-3xl cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
           <nav class="h-[93dvh] w-0 overflow-hidden bg-gray-900 absolute border-r border-gray-100/10 left-0 top-[7dvh] flex flex-col gap-y-2 duration-150" :class="{ '!p-4 !w-2/3': showSidebar }">
             <ul class="hidden flex-col gap-y-2" :class="{ '!flex': showSidebar }">
                 <li>
@@ -37,10 +39,17 @@
                 <button @click="signout" class="bg-blue-500 rounded mt-6 py-1 hover:bg-blue-500/95">Sign out</button>
             </ul>
           </nav>  
+          <button class="flex lg:hidden hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group" @click="toggleDarkmode">
+            <Icon icon="ic:twotone-dark-mode" class="text-white hidden dark:block text-2xl" />
+            <Icon icon="ic:twotone-light-mode" class="text-yellow-500 block dark:hidden text-2xl" />
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border border-gray-100/10 py-1 rounded-md hidden group-hover:block transition duration-500">
+              <p class="text-[.6rem]">Switch mode</p>
+            </div>
+          </button>
         </div>
         <!-- profile -->
         <div class="hidden lg:flex items-center gap-x-2">
-          <div class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
+          <div  v-if="authStore.isAuthenticated" class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
             <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block">
             <Icon icon="mynaui:search" class="text-gray-300 dark:text-white text-2xl" />
           </div>
@@ -52,12 +61,13 @@
             </div>
           </button>
           <div v-if="authStore.isAuthenticated" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <Img
-                v-if="currentUser && currentUser.photoURL"
-                :src="currentUser.photoURL"
-                alt="profile pic"
-                class="rounded-full w-7 aspect-square"
-            />
+            <router-link :to="{ name: 'userDetails', params: { id: currentUser.uid } }" class="!bg-transparent" v-if="currentUser && currentUser.photoURL">
+              <Img
+                  :src="currentUser.photoURL"
+                  alt="profile pic"
+                  class="rounded-full w-7 aspect-square"
+              />
+            </router-link>
             <Icon v-else icon="mdi:user" class="text-white text-3xl border rounded-full p-1" />
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border border-gray-100/10 py-1 rounded-md hidden group-hover:block transition duration-500">
               <p class="text-[.6rem] text-center">Profile</p>
@@ -74,11 +84,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './plugins/firebase'
 import { useAuthStore } from './store'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { db } from './plugins/firebase'
 import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit } from 'firebase/firestore'
 
@@ -86,6 +96,7 @@ import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit } fro
 import sideBar from './components/sideBar.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const authStore = useAuthStore()
 
@@ -93,6 +104,13 @@ const currentUser = ref(null)
 
 const iconType = ref('eva:menu-fill')
 const showSidebar = ref(false)
+
+watch(() => route.path, (newPath) => {
+  if(newPath){
+    showSidebar.value = false
+    iconType.value = 'eva:menu-fill'
+  }
+})
 
 const toggleSidebar = () => {
   showSidebar.value = !showSidebar.value

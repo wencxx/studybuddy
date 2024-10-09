@@ -1,14 +1,14 @@
 <template>
-    <div class="flex flex-col gap-y-5 mx-auto px-10 md:px-20">
-        <div v-if="user" class="flex items-center gap-x-5">
+    <div v-if="user" class="flex flex-col gap-y-5 mx-auto px-10 md:px-20" id="container">
+        <div class="flex items-center gap-x-5">
             <img :src="user.photoURL" alt="profilePic" class="rounded-full">
             <div>
                 <h2 class="text-2xl">{{ user.displayName }}</h2>
                 <p class="text-sm">{{ user.email }}</p>
             </div>
         </div>
-        <p v-if="user">Bio here soon to come!</p>
-        <div v-if="user" class="flex gap-x-5">
+        <p class="text-sm text-gray-100/55">Bio here soon to come!</p>
+        <div v-if="user.userId !== currentUser.uid" class="flex gap-x-5">
             <div class="w-1/2" :class="{ '!w-full': isCollaborated(user?.userId) === 'request'}">
                 <button class="border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 w-full h-full capitalize rounded flex justify-center items-center gap-x-2" v-if="isCollaborated(user?.userId) === 'collaborated'" @click="toggleCollab('collaborated', user?.userId)">
                     <Icon icon="fluent-mdl2:user-sync" class="text-xl" />
@@ -37,10 +37,63 @@
                 <span>Message</span>
             </router-link>
         </div>
+        <div v-else>
+            <router-link :to="{ name: 'message', params: { id: user?.userId } }" class="w-full border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
+                <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
+                <span>Messages</span>
+            </router-link>
+        </div>
+        <!-- post -->
+        <div v-if="posts && posts?.length > 0" class="flex flex-col gap-y-5 mt-10">
+            <div v-for="post in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
+                <!-- post header -->
+                <div class="flex items-center gap-x-3">
+                    <img v-if="post.photoURL" :src="post.photoURL" alt="profile pic" class="h-9 aspect-square rounded-full" />
+                    <div v-else class="flex border rounded-full p-2">
+                        <Icon icon="mdi:user"  class="text-gray-500 text-xl dark:text-white" />
+                    </div>
+                    <div>
+                        <h2 class="font-semibold cursor-pointer hover:underline hover:text-gray-200">{{ post.name }}</h2>
+                        <p class="text-[.7rem]">{{ formatDate(post.postedAt) }}</p>
+                    </div>
+                    <Icon icon="mdi:dots-vertical" class="text-gray-500 dark:text-white text-2xl ml-auto" />
+                </div>
+                <!-- post body -->
+                <div>
+                    <p class="line-clamp-4">{{ post.postDetails }}{{ post.userId }}</p>
+                </div>
+                <!-- post footer -->
+                <div class="mt-1 flex items-center justify-between">
+                    <div class="flex gap-x-2">
+                        <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
+                        <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
+                    </div>  
+                    <div>
+                        <p class="text-xs text-gray-400 cursor-pointer">{{ post.comments.length }} comments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p v-else class="text-center"> No post to show</p>
+    </div>
+    <div v-else class="flex flex-col gap-y-5 mx-auto px-10 md:px-20">
+        <div class="flex items-center gap-x-5">
+            <div class="h-24 aspect-square bg-gray-300 rounded-full animate-pulse"></div>
+            <div>
+                <div class="h-7 w-40 bg-gray-300 animate-pulse rounded"></div>
+                <div class="h-4 w-32 bg-gray-300 animate-pulse rounded mt-2"></div>
+            </div>
+        </div>
+        <div class="h-4 w-32 bg-gray-300 animate-pulse rounded mt-2"></div>
+        <div class="flex gap-x-2">
+            <div class="w-1/2 h-8 bg-gray-300 animate-pulse rounded"></div>
+            <div class="w-1/2 h-8 bg-gray-300 animate-pulse rounded"></div>
+        </div>
     </div>
 </template>
 
 <script setup>
+import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed } from 'vue';
 import { collection, query, where, getDocs, limit, updateDoc, arrayUnion, arrayRemove, doc } from 'firebase/firestore';
 import { db } from '../plugins/firebase'; 
@@ -57,6 +110,7 @@ const route = useRoute()
 
 const user = ref(null);
 
+// get visited user
 const getUser = async () => {
   const q = query(
     collection(db, 'users'),
@@ -70,6 +124,29 @@ const getUser = async () => {
   });
 };
 
+// get users posts
+const posts = ref([])
+
+const getUserPosts = async () => {
+  const q = query(
+    collection(db, 'posts'),
+    where('userId', '==', route.params.id)
+  );
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    posts.value.push(doc.data())
+  });
+};
+
+const formatDate = (firestoreTimestamp) => {
+     const date = firestoreTimestamp.toDate();
+  
+    return formatDistanceToNow(date, { addSuffix: true });
+}
+
+
+// toggle collaboration button
 const toggleCollab = async (type, id) => {
     if(type === 'request'){
         try {
@@ -198,9 +275,17 @@ const toggleCollab = async (type, id) => {
 
 onMounted(() => {
   getUser();
+  getUserPosts()
 });
 </script>
 
 <style scoped>
-
+#container::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1px;
+}
+#container::-webkit-scrollbar-thumb {
+    background-color: lightgray;
+    border-radius: 50px;
+}
 </style>
