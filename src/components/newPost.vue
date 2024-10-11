@@ -49,8 +49,6 @@ const post = async () => {
     try {
       const docRef = await addDoc(collection(db, 'posts'), {
         postDetails: postDetails.value,
-        comments: [],
-        reacts: [],
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,
         photoURL: currentUser.value.photoURL,

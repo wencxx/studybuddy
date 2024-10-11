@@ -26,7 +26,7 @@
                     <div class="ml-auto relative">
                         <Icon icon="mdi:dots-vertical" class="text-gray-500 dark:text-white text-2xl" @click="togglePostMenu(post.id)" />
                         <div :id="post.id" v-if="postMenu == post.id" class="flex flex-col w-fit items-start gap-y-[.2rem] absolute right-3 border border-gray-300 dark:border-gray-100/10 py-2 px-3 bg-white dark:bg-gray-900 rounded">
-                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white">Edit</button>
+                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="editPostSigle(post.id)">Edit</button>
                             <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="deletePost(post.id)">Delete</button>
                             <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white">report</button>
                         </div>
@@ -37,20 +37,23 @@
                     <p class="line-clamp-4">{{ post.postDetails }}</p>
                 </div>
                 <!-- post footer -->
-                <div class="mt-1 flex items-center justify-between">
+                <div class="mt-1 flex items-center gap-x-3">
                     <div class="flex gap-x-2">
                         <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
                         <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
                     </div>  
-                    <div>
-                        <p class="text-xs text-gray-400 cursor-pointer">{{ post.comments.length }} comments</p>
-                    </div>
+                    <p class="text-sm text-gray-500 cursor-pointer" @click="toggleComment(post)">{{ commentCounts[post.id]}} comments</p>
                 </div>
             </div>
         </div>
         <p v-if="posts && posts.length === 0" class="text-center"> No post to show</p>
 
+        <!-- add new post component -->
         <newPost v-if="addNewPost" @click.self="addNewPost = false" @closeModal="addNewPost = false" />
+        <!-- edit post component -->
+        <editPost v-if="editPostModal" :postDetails="postToEdit" @click.self="editPostModal = false" @closeModal="editPostModal = false" />
+        <!-- view comments component -->
+        <comments :postDetails="postDetails" v-if="toggledComment" @click.self="toggleComment" @closeModal="toggleComment" />
     </div>
     <div v-else>
         <div class="w-full mb-14 flex items-center gap-x-3 p-4 rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 animate-pulse">
@@ -82,17 +85,26 @@
 </template>
 
 <script setup>
+// components
 import newPost from '../components/newPost.vue'
+import editPost from '../components/editPost.vue'
+import comments from '../components/comments.vue'
+// mods
 import { formatDistanceToNow } from 'date-fns'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
-import { onSnapshot, collection, updateDoc, arrayUnion, query, orderBy, deleteDoc, doc } from 'firebase/firestore'
+import { onSnapshot, collection, updateDoc, arrayUnion, query, orderBy, deleteDoc, doc, getCountFromServer, where } from 'firebase/firestore'
 
 onMounted(() => {
     getPosts()
+    watch(posts, () => {
+        posts.value.forEach(post => countComments(post.id))
+    } )
 })
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const currentUser = computed(() => authStore.currentUser)
@@ -114,13 +126,27 @@ const togglePostMenu = (postId) => {
 const posts = ref([])
 
 // get realtime posts
-const getPosts = () => {
+const getPosts = (postId) => {
     onSnapshot(
-        query(collection(db, 'posts'), orderBy('postedAt', 'desc')), (snapshot) => {
+        query(collection(db, 'posts'), orderBy('postedAt', 'desc')), 
+        (snapshot) => {
         posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     });
 }
 
+// edit post
+const editPostModal = ref(false)
+const postToEdit = ref({})
+
+const editPostSigle = (postId) => {
+    editPostModal.value = true
+    const postDets = posts.value.find(p => p.id === postId)
+    postToEdit.value = { ...postDets }
+
+    console.log(postToEdit.value)
+}
+
+// delete post
 const deletePost = async (postId) => {
     const postRef = doc(db, 'posts', postId)
 
@@ -146,6 +172,54 @@ const requestCollaboration = async (uid) => {
         console.error('Error adding friend: ', error);
     }
 }
+
+
+// view comments
+const toggledComment = ref(false)
+const postDetails = ref(null)
+
+const toggleComment = (postDets) => {
+
+    if(toggledComment.value === false){
+        router.push({
+            query: {
+                c: postDets.id
+            }
+        })
+
+        postDetails.value = postDets
+
+        toggledComment.value = true
+    }else{
+        toggledComment.value = false
+        router.push({
+            query: {}
+        });
+    }
+
+}
+
+// count comments by post
+
+const commentCounts = ref({})
+
+const countComments = async (postId) => {
+    try {
+        const q = query(
+            collection(db, 'comments'),
+            where('postId', '==', postId)
+        );
+
+        const snapshot = await getCountFromServer(q);
+
+        if (snapshot) {
+            commentCounts.value[postId] = snapshot.data().count;
+        }
+    } catch (error) {
+        console.log(error);
+        commentCounts.value[postId] = 0
+    }
+};
 
 </script>
 

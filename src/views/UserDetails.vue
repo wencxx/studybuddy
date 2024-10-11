@@ -45,7 +45,7 @@
         </div>
         <!-- post -->
         <div v-if="posts && posts?.length > 0" class="flex flex-col gap-y-5 mt-10">
-            <div v-for="post in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
+            <div v-for="(post) in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
                 <!-- post header -->
                 <div class="flex items-center gap-x-3">
                     <img v-if="post.photoURL" :src="post.photoURL" alt="profile pic" class="h-9 aspect-square rounded-full" />
@@ -56,11 +56,18 @@
                         <h2 class="font-semibold cursor-pointer hover:underline hover:text-gray-200">{{ post.name }}</h2>
                         <p class="text-[.7rem]">{{ formatDate(post.postedAt) }}</p>
                     </div>
-                    <Icon icon="mdi:dots-vertical" class="text-gray-500 dark:text-white text-2xl ml-auto" />
+                    <div class="ml-auto relative">
+                        <Icon icon="mdi:dots-vertical" class="text-gray-500 dark:text-white text-2xl" @click="togglePostMenu(post.id)" />
+                        <div :id="post.id" v-if="postMenu == post.id" class="flex flex-col w-fit items-start gap-y-[.2rem] absolute right-3 border border-gray-300 dark:border-gray-100/10 py-2 px-3 bg-white dark:bg-gray-900 rounded">
+                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white">Edit</button>
+                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="deletePost(post.id)">Delete</button>
+                            <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white">report</button>
+                        </div>
+                    </div>
                 </div>
                 <!-- post body -->
                 <div>
-                    <p class="line-clamp-4">{{ post.postDetails }}{{ post.userId }}</p>
+                    <p class="line-clamp-4">{{ post.postDetails }}</p>
                 </div>
                 <!-- post footer -->
                 <div class="mt-1 flex items-center justify-between">
@@ -135,7 +142,7 @@ const getUserPosts = async () => {
 
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    posts.value.push(doc.data())
+    posts.value.push({ id: doc.id, ...doc.data() })
   });
 };
 
@@ -270,6 +277,17 @@ const toggleCollab = async (type, id) => {
         } catch (error) {
             console.error(error)
         }
+    }
+}
+
+const postMenu = ref('')
+
+// toggle post menu
+const togglePostMenu = (postId) => {
+    if(postMenu.value){
+        postMenu.value = ''
+    }else{
+        postMenu.value = postId
     }
 }
 
