@@ -9,7 +9,7 @@
         </div>
         <!-- nav -->
         <div class="flex lg:hidden items-center">
-          <Icon :icon="iconType" class="text-3xl text-gray-900 cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
+          <Icon :icon="iconType" class="text-3xl text-gray-900 dark:text-white cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
           <nav class="h-[93dvh] w-0 overflow-hidden bg-gray-900 absolute border-r border-gray-100/10 left-0 top-[7dvh] flex flex-col gap-y-2 duration-150" :class="{ '!p-4 !w-2/3': showSidebar }">
             <ul class="hidden flex-col gap-y-2" :class="{ '!flex': showSidebar }">
                 <li>
