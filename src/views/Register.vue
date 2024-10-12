@@ -84,6 +84,7 @@ const password = ref('')
 
 const registering = ref(false)
 
+//sign up using email and password
 const signup = async () => {
     const imageRef = storageRef(storage, `images/${image.value.name}`)
 
@@ -108,6 +109,7 @@ const signup = async () => {
     }
 }
 
+// sign in using gmail
 const signinWithGoogle = async () => {
     try {
         const result = await signInWithPopup(auth, provider)

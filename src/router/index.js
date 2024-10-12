@@ -1,29 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store'
-import Login from '../views/Login.vue'
-import Register from '../views/Register.vue'
-import Newsfeed from '../views/Newsfeed.vue'
-import Notes from '../views/Notes.vue'
-import Tasks from '../views/Tasks.vue'
-import UserDetails from '../views/UserDetails.vue'
-import Message from '../views/Message.vue'
+// import Login from '../views/Login.vue'
+// import Register from '../views/Register.vue'
+// import Notes from '../views/Notes.vue'
+// import Tasks from '../views/Tasks.vue'
+// import UserDetails from '../views/UserDetails.vue'
+// import Message from '../views/Message.vue'
 
 
 const routes = [
     {
         path: '/',
         name: 'login',
-        component: Login
+        component: () => import('../views/Login.vue')
     },
     {
         path: '/register',
         name: 'register',
-        component: Register
+        component: () => import('../views/Register.vue')
     },
     {
         path: '/home',
         name: 'newsfeed',
-        component: Newsfeed,
+        component: () => import('../views/Newsfeed.vue'),
         meta: {
             requiresAuth: true
         }
@@ -31,7 +30,7 @@ const routes = [
     {
         path: '/task',
         name: 'tasks',
-        component: Tasks,
+        component: () => import('../views/Tasks.vue'),
         meta: {
             requiresAuth: true
         }
@@ -39,7 +38,7 @@ const routes = [
     {
         path: '/notes',
         name: 'notes',
-        component: Notes,
+        component: () => import('../views/Notes.vue'),
         meta: {
             requiresAuth: true
         }
@@ -47,7 +46,7 @@ const routes = [
     {
         path: '/user-details/:id',
         name: 'userDetails',
-        component: UserDetails,
+        component: () => import('../views/UserDetails.vue'),
         meta: {
             requiresAuth: true
         }
@@ -55,7 +54,7 @@ const routes = [
     {
         path: '/message/:id',
         name: "message",
-        component: Message,
+        component: () => import('../views/Message.vue'),
         meta: {
             requiresAuth: true
         }

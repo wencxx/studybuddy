@@ -1,7 +1,10 @@
 <template>
     <div v-if="user" class="flex flex-col gap-y-5 mx-auto px-10 md:px-20" id="container">
         <div class="flex items-center gap-x-5">
-            <img :src="user.photoURL" alt="profilePic" class="rounded-full">
+            <img v-if="user.photoURL" :src="user.photoURL" alt="profilePic" class="rounded-full">
+            <div v-else class="h-16 aspect-square border rounded-full flex items-center justify-center">
+                <Icon icon="fluent:person-16-filled" class="text-5xl" />
+            </div>
             <div>
                 <h2 class="text-2xl">{{ user.displayName }}</h2>
                 <p class="text-sm">{{ user.email }}</p>

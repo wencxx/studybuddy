@@ -1,16 +1,30 @@
 <template>
     <div class="flex flex-col overflow-hidden">
-        <div class="flex items-center gap-x-5 mb-2">
+        <div v-if="user" class="flex items-center gap-x-5 mb-2">
             <img v-if="user?.photoURL" :src="user?.photoURL" alt="profilepic" class="rounded-full h-16 aspect-square">
             <div>
                 <h1 class="text-xl">{{ user?.displayName }}</h1>
                 <p class="text-xs text-gray-300 dark:text-gray-300/55">{{ user?.email }}</p>
             </div>
         </div>
-        <div class="h-full flex flex-col-reverse py-5 gap-y-5">
+        <div v-else class="flex items-center gap-x-5 mb-2">
+            <div class="h-16 aspect-square rounded-full bg-gray-300 animate-pulse"></div>
+            <div class="space-y-2">
+                <div class="h-6 w-36 bg-gray-300 animate-pulse rounded-md"></div>
+                <div class="h-3 w-48 bg-gray-300 animate-pulse rounded-md"></div>
+            </div>
+        </div>
+        <div v-if="user" class="h-full flex flex-col-reverse py-5 gap-y-5">
             <div v-for="message in messages" :key="message" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded w-fit" :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
                 {{ message.message }}
             </div>
+        </div>
+        <div v-else class="h-full flex flex-col-reverse py-5 gap-y-5">
+            <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/3"></div>
+            <div class="h-8 rounded-md bg-gray-300 animate-pulse self-end w-1/3"></div>
+            <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/2"></div>
+            <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/3"></div>
+            <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/2 self-end"></div>
         </div>
         <form @submit.prevent="sendMessage(user?.userId)" class="h-14 w-full mb-1 flex gap-x-2">
             <input v-model="message" type="text" placeholder="Enter a message" class="h-full focus:outline-none rounded-md bg-transparent pl-2 border border-gray-300 dark:border-gray-100/10 w-full">

@@ -9,7 +9,7 @@
         </div>
         <!-- nav -->
         <div class="flex lg:hidden items-center">
-          <Icon :icon="iconType" class="text-3xl cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
+          <Icon :icon="iconType" class="text-3xl text-gray-900 cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
           <nav class="h-[93dvh] w-0 overflow-hidden bg-gray-900 absolute border-r border-gray-100/10 left-0 top-[7dvh] flex flex-col gap-y-2 duration-150" :class="{ '!p-4 !w-2/3': showSidebar }">
             <ul class="hidden flex-col gap-y-2" :class="{ '!flex': showSidebar }">
                 <li>
@@ -46,18 +46,30 @@
               <p class="text-[.6rem]">Switch mode</p>
             </div>
           </button>
+          <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+              <p class="text-[.6rem]">Messages</p>
+            </div>
+          </button>
         </div>
         <!-- profile -->
         <div class="hidden lg:flex items-center gap-x-2">
           <div  v-if="authStore.isAuthenticated" class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
             <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block">
-            <Icon icon="mynaui:search" class="text-gray-300 dark:text-white text-2xl" />
+            <Icon icon="mynaui:search" class="text-gray-400 dark:text-white text-2xl" />
           </div>
           <button class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group" @click="toggleDarkmode">
-            <Icon icon="ic:twotone-dark-mode" class="text-white hidden dark:block text-2xl" />
+            <Icon icon="ic:twotone-dark-mode" class="hidden dark:block text-2xl" />
             <Icon icon="ic:twotone-light-mode" class="text-yellow-500 block dark:hidden text-2xl" />
-            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border border-gray-100/10 py-1 rounded-md hidden group-hover:block transition duration-500">
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem]">Switch mode</p>
+            </div>
+          </button>
+          <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+              <p class="text-[.6rem]">Messages</p>
             </div>
           </button>
           <div v-if="authStore.isAuthenticated" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
@@ -69,13 +81,14 @@
               />
             </router-link>
             <Icon v-else icon="mdi:user" class="text-white text-3xl border rounded-full p-1" />
-            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border border-gray-100/10 py-1 rounded-md hidden group-hover:block transition duration-500">
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem] text-center">Profile</p>
             </div>
           </div>
-          <button v-if="authStore.isAuthenticated" class="text-sm bg-blue-500 rounded px-2 py-1" @click="signout">Sign Out</button>
+          <button v-if="authStore.isAuthenticated" class="text-sm text-white bg-blue-500 rounded px-2 py-1" @click="signout">Sign Out</button>
         </div>
       </header>
+      <!-- body -->
       <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
         <router-view :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
