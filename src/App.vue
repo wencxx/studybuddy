@@ -19,7 +19,7 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link :to="{ name: 'tasks' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="mingcute:task-2-fill" class="text-3xl" />
                         <span class="text-xl">Tasks</span>
                     </router-link>
@@ -74,7 +74,7 @@
           </button>
           <div v-if="authStore.isAuthenticated" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
             <router-link :to="{ name: 'userDetails', params: { id: currentUser.uid } }" class="!bg-transparent" v-if="currentUser && currentUser.photoURL">
-              <Img
+              <img
                   :src="currentUser.photoURL"
                   alt="profile pic"
                   class="rounded-full w-7 aspect-square"

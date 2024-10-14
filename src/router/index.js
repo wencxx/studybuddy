@@ -1,12 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store'
-// import Login from '../views/Login.vue'
-// import Register from '../views/Register.vue'
-// import Notes from '../views/Notes.vue'
-// import Tasks from '../views/Tasks.vue'
-// import UserDetails from '../views/UserDetails.vue'
-// import Message from '../views/Message.vue'
-
 
 const routes = [
     {
@@ -28,9 +21,9 @@ const routes = [
         }
     },
     {
-        path: '/task',
-        name: 'tasks',
-        component: () => import('../views/Tasks.vue'),
+        path: '/quiz',
+        name: 'quiz',
+        component: () => import('../views/Quiz.vue'),
         meta: {
             requiresAuth: true
         }

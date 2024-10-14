@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-y-14" id="contents">
         <!-- add new post -->
         <div v-if="currentUser" class="w-full flex items-center gap-x-3 p-4 rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10">
-            <img v-if="currentUser.photoURL" :src="currentUser?.photoURL" class="h-9 aspect-square rounded-full" />
+            <img v-if="currentUser?.photoURL" :src="currentUser?.photoURL" class="h-9 aspect-square rounded-full" />
             <div v-else class="rounded-full border flex items-center justify-center p-2">
                 <Icon icon="mdi:user" class="text-gray-500 text-xl dark:text-white" />
             </div>
@@ -15,7 +15,7 @@
         </div>
         <!-- post -->
         <div v-if="currentUser">
-            <div v-if="posts && posts.length > 0" class="flex flex-col gap-y-5">
+            <div v-if="posts && posts.length > 0" class="flex flex-col gap-y-5 mb-5">
                 <div v-for="post in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
                     <!-- post header -->
                     <div class="flex items-center gap-x-3">
@@ -57,7 +57,7 @@
                             <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
                             <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
                         </div>  
-                        <p class="text-sm text-gray-500 cursor-pointer" @click="toggleComment(post)">{{ commentCounts[post.id]}} comments</p>
+                        <p class="text-sm text-gray-500 cursor-pointer" @click="toggleComment(post)">{{ commentCounts[post.id] }} comments</p>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@ onMounted(() => {
     getPosts()
     watch(posts, () => {
         posts.value.forEach(post => countComments(post.id))
-    } )
+    })
 })
 
 const router = useRouter()

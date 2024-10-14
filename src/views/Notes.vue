@@ -33,27 +33,40 @@
 <script setup>
 import newNotes from '../components/newNotes.vue'
 import { formatDistanceToNow } from 'date-fns'
-import { computed, onMounted, ref, defineProps, toRef } from 'vue'
+import { computed, onMounted, ref, defineProps, toRef, watch } from 'vue'
 import { onSnapshot, query, orderBy, where, collection } from 'firebase/firestore'
 import { db } from '../plugins/firebase'
+import { useAuthStore } from '../store'
+
+const authStore = useAuthStore()
+
+const currentUser = computed(() => authStore.currentUser)
 
 const addNewNote = ref(false)
 const notes = ref([])
 
-const { userId } = defineProps({
+const props = defineProps({
     userId: String
 })
 
 onMounted(() => {
-    getNotes()
+    if (currentUser.value && currentUser.value.uid) {
+        getNotes();
+    }
+    
+    watch(currentUser, (newVal) => {
+        if (newVal && newVal.uid) {
+            getNotes();     
+        }
+    })
 })
 
 // get real time notes
 const getNotes = () => {
-    if(userId){
+    if(props.userId){
         const notesQuery = query(
             collection(db, 'notes'),
-            where('userId', '==', userId),
+            where('userId', '==', currentUser.value.uid),
             orderBy('addedAt', 'desc')
         );
 

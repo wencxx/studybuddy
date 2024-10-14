@@ -20,6 +20,15 @@
                 <div>
                     <p>{{ postDetails.postDetails }}</p>
                 </div>
+                <!-- images -->
+                <div v-if="postDetails.postImages && postDetails.postImages?.length > 0" class="grid grid-cols-2 gap-1"  :class="{ 'col-span-2': postDetails.postImages?.length === 3 && index === 2, '!grid-cols-1': postDetails.postImages?.length === 1}">
+                    <div v-for="(imageUrl, index) in postDetails.postImages" :key="index" class="relative rounded cursor-pointer overflow-hidden" :class="{ 'hidden': index > 3 }" @click="viewPostImages(post.postImages, index)" >
+                        <img :src="imageUrl" alt="image posted" class="w-full aspect-square" :class="{ 'aspect-video': postDetails.postImages?.length === 3 && index === 2, 'h-96': postDetails.postImages?.length === 1 }" loading="lazy">
+                        <div v-if="postDetails.postImages?.length > 4 && index === 3" class="absolute top-0 left-0 w-full h-full bg-black/75 flex items-center justify-center">
+                            <p class="text-3xl">+{{ postDetails.postImages?.length - 4 }}</p>
+                        </div>
+                    </div>
+                </div>
                 <!-- post footer -->
                 <div class="flex justify-between">
                     <Icon icon="mdi-light:heart" class="text-xl dark:text-gray-100/55 cursor-pointer hover:text-gray-500 hover:dark:text-gray-100/65" />

@@ -9,9 +9,9 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link :to="{ name: 'tasks' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="mingcute:task-2-fill" class="text-2xl" />
-                        <span class="text-xl">Tasks</span>
+                        <span class="text-xl">Quiz</span>
                     </router-link>
                 </li>
                 <li>

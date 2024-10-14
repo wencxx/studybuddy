@@ -41,13 +41,13 @@
             </router-link>
         </div>
         <div v-else>
-            <router-link :to="{ name: 'message', params: { id: user?.userId } }" class="w-full border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
+            <router-link class="w-full border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
                 <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
                 <span>Messages</span>
             </router-link>
         </div>
         <!-- post -->
-        <div v-if="posts && posts?.length > 0" class="flex flex-col gap-y-5 mt-10">
+        <div v-if="posts && posts?.length > 0" class="flex flex-col gap-y-5 mt-10 pb-5">
             <div v-for="(post) in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
                 <!-- post header -->
                 <div class="flex items-center gap-x-3">
@@ -72,6 +72,15 @@
                 <div>
                     <p class="line-clamp-4">{{ post.postDetails }}</p>
                 </div>
+                <!-- images -->
+                <div v-if="post.postImages && post.postImages?.length > 0" class="grid grid-cols-2 gap-1"  :class="{ 'col-span-2': post.postImages?.length === 3 && index === 2, '!grid-cols-1': post.postImages?.length === 1}">
+                    <div v-for="(imageUrl, index) in post.postImages" :key="index" class="relative rounded cursor-pointer overflow-hidden" :class="{ 'hidden': index > 3 }" @click="viewPostImages(post.postImages, index)" >
+                        <img :src="imageUrl" alt="image posted" class="w-full aspect-square" :class="{ 'aspect-video': post.postImages?.length === 3 && index === 2, 'h-96': post.postImages?.length === 1 }" loading="lazy">
+                        <div v-if="post.postImages?.length > 4 && index === 3" class="absolute top-0 left-0 w-full h-full bg-black/75 flex items-center justify-center">
+                            <p class="text-3xl">+{{ post.postImages?.length - 4 }}</p>
+                        </div>
+                    </div>
+                </div>
                 <!-- post footer -->
                 <div class="mt-1 flex items-center justify-between">
                     <div class="flex gap-x-2">
@@ -79,12 +88,16 @@
                         <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
                     </div>  
                     <div>
-                        <p class="text-xs text-gray-400 cursor-pointer">{{ post.comments.length }} comments</p>
+                        <p @click="toggleComment(post)" class="text-xs text-gray-400 cursor-pointer">{{ commentCounts[post.id] }} comments</p>
                     </div>
                 </div>
             </div>
         </div>
         <p v-else class="text-center"> No post to show</p>
+        <!-- view comments component -->
+        <comments :postDetails="postDetails" v-if="toggledComment" @click.self="toggleComment" @closeModal="toggleComment" />
+        <!-- view post images -->
+        <viewImages @closeModal="viewImagesModal = false" v-if="viewImagesModal" :images="imagesToview" :imageIndex="imageIndex"  />
     </div>
     <div v-else class="flex flex-col gap-y-5 mx-auto px-10 md:px-20">
         <div class="flex items-center gap-x-5">
@@ -103,11 +116,13 @@
 </template>
 
 <script setup>
+import viewImages from '../components/viewPostImages.vue'
+import comments from '../components/comments.vue'
 import { formatDistanceToNow } from 'date-fns'
-import { ref, onMounted, computed } from 'vue';
-import { collection, query, where, getDocs, limit, updateDoc, arrayUnion, arrayRemove, doc } from 'firebase/firestore';
+import { ref, onMounted, computed, watch } from 'vue';
+import { collection, query, where, getDocs, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
 import { db } from '../plugins/firebase'; 
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { indexedDBLocalPersistence } from 'firebase/auth';
 
@@ -117,6 +132,7 @@ const isCollaborated = computed(() => authStore.isCollaborated)
 const currentUser = computed(() => authStore.currentUser)
 
 const route = useRoute()
+const router = useRouter()
 
 const user = ref(null);
 
@@ -134,13 +150,50 @@ const getUser = async () => {
   });
 };
 
+// view post images
+const viewImagesModal = ref(false)
+const imagesToview = ref([])
+const imageIndex = ref('')
+
+const viewPostImages = (images, index) => {
+    imagesToview.value = images
+    imageIndex.value = index
+    viewImagesModal.value = true
+}
+
+// view comments
+const toggledComment = ref(false)
+const postDetails = ref(null)
+
+const toggleComment = (postDets) => {
+
+    if(toggledComment.value === false){
+        router.push({
+            query: {
+                c: postDets.id
+            }
+        })
+
+        postDetails.value = postDets
+
+        toggledComment.value = true
+    }else{
+        toggledComment.value = false
+        router.push({
+            query: {}
+        });
+    }
+
+}
+
 // get users posts
 const posts = ref([])
 
 const getUserPosts = async () => {
   const q = query(
     collection(db, 'posts'),
-    where('userId', '==', route.params.id)
+    where('userId', '==', route.params.id),
+    orderBy('postedAt', 'desc')
   );
 
   const querySnapshot = await getDocs(q);
@@ -294,9 +347,32 @@ const togglePostMenu = (postId) => {
     }
 }
 
+const commentCounts = ref({})
+
+const countComments = async (postId) => {
+    try {
+        const q = query(
+            collection(db, 'comments'),
+            where('postId', '==', postId)
+        );
+
+        const snapshot = await getCountFromServer(q);
+
+        if (snapshot) {
+            commentCounts.value[postId] = snapshot.data().count;
+        }
+    } catch (error) {
+        console.log(error);
+        commentCounts.value[postId] = 0
+    }
+};
+
 onMounted(() => {
-  getUser();
-  getUserPosts()
+    getUser();
+    getUserPosts()
+    watch(posts.value, () => {
+        posts.value.forEach(post => countComments(post.id))
+    })
 });
 </script>
 
@@ -304,6 +380,7 @@ onMounted(() => {
 #container::-webkit-scrollbar {
     background-color: transparent;
     width: 1px;
+    display: none;
 }
 #container::-webkit-scrollbar-thumb {
     background-color: lightgray;
