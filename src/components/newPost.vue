@@ -108,7 +108,7 @@ const post = async () => {
       });
       closeModal()
       postDetails.value = ''
-      console.log('Document written with ID: ', docRef.id);
+      // console.log('Document written with ID: ', docRef.id);
     } catch (error) {
       console.error('Error creating post: ', error);
     }finally{

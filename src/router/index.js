@@ -45,6 +45,22 @@ const routes = [
         }
     },
     {
+        path: '/notifications',
+        name: "notifications",
+        component: () => import('../views/Notifications.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/messages',
+        name: "messages",
+        component: () => import('../views/Messages.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/message/:id',
         name: "message",
         component: () => import('../views/Message.vue'),

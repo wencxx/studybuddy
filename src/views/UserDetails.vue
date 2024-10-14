@@ -41,7 +41,7 @@
             </router-link>
         </div>
         <div v-else>
-            <router-link class="w-full border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
+            <router-link :to="{ name: 'messages' }" class="w-full border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
                 <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
                 <span>Messages</span>
             </router-link>
@@ -62,7 +62,7 @@
                     <div class="ml-auto relative">
                         <Icon icon="mdi:dots-vertical" class="text-gray-500 dark:text-white text-2xl" @click="togglePostMenu(post.id)" />
                         <div :id="post.id" v-if="postMenu == post.id" class="flex flex-col w-fit items-start gap-y-[.2rem] absolute right-3 border border-gray-300 dark:border-gray-100/10 py-2 px-3 bg-white dark:bg-gray-900 rounded">
-                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white">Edit</button>
+                            <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="editPostSigle(post.id)">Edit</button>
                             <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="deletePost(post.id)">Delete</button>
                             <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white">report</button>
                         </div>
@@ -96,6 +96,8 @@
         <p v-else class="text-center"> No post to show</p>
         <!-- view comments component -->
         <comments :postDetails="postDetails" v-if="toggledComment" @click.self="toggleComment" @closeModal="toggleComment" />
+        <!-- edit post component -->
+        <editPost v-if="editPostModal" :postDetails="postToEdit" @click.self="editPostModal = false" @closeModal="editPostModal = false" />
         <!-- view post images -->
         <viewImages @closeModal="viewImagesModal = false" v-if="viewImagesModal" :images="imagesToview" :imageIndex="imageIndex"  />
     </div>
@@ -118,6 +120,7 @@
 <script setup>
 import viewImages from '../components/viewPostImages.vue'
 import comments from '../components/comments.vue'
+import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
 import { collection, query, where, getDocs, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
@@ -201,6 +204,17 @@ const getUserPosts = async () => {
     posts.value.push({ id: doc.id, ...doc.data() })
   });
 };
+
+// edit post
+const editPostModal = ref(false)
+const postToEdit = ref({})
+
+const editPostSigle = (postId) => {
+    editPostModal.value = true
+    const postDets = posts.value.find(p => p.id === postId)
+    postToEdit.value = { ...postDets }
+    postMenu.value = ''
+}
 
 const formatDate = (firestoreTimestamp) => {
      const date = firestoreTimestamp.toDate();

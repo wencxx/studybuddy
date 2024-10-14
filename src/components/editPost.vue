@@ -11,7 +11,8 @@
         <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="postDetails.postDetails" autofocus></textarea>
         <!-- buttons -->
         <div>
-          <button class="float-end bg-gray-300 dark:bg-gray-600 w-fit px-2 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700">Save changes</button>
+          <button v-if="!updating" class="float-end bg-gray-300 dark:bg-gray-600 w-fit px-2 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700">Save changes</button>
+          <button v-else class="float-end bg-gray-300 dark:bg-gray-600 w-fit px-2 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700 animate-pulse" disabled>Updating</button>
         </div>
       </div>
     </form>
@@ -42,13 +43,18 @@ const closeModal = () => {
 }
 
 
+const updating = ref(false)
+
 const update = async () => {
   const postRef = doc(db, 'posts', postDetails.value.id)
 
   try {
+    updating.value = true
     await updateDoc(postRef, {
       postDetails: postDetails.value.postDetails
     })
+
+    updating.value = false
 
     closeModal()
   } catch (error) {

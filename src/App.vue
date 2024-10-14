@@ -67,9 +67,19 @@
             </div>
           </button>
           <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+            <router-link :to="{ name: 'messages' }">
+              <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+            </router-link>
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem]">Messages</p>
+            </div>
+          </button>
+          <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <router-link :to="{ name: 'notifications' }">
+              <Icon icon="ion:notifications" class="text-2xl text-gray-400 dark:text-gray-300" />
+            </router-link>
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+              <p class="text-[.6rem]">Notifications</p>
             </div>
           </button>
           <div v-if="authStore.isAuthenticated" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">

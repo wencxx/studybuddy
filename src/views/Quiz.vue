@@ -4,7 +4,7 @@
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewPost = true">Add Quiz</button>
         </div>
 
-        <div class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div v-if="quizzes.length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             <div v-for="(quiz, index) in quizzes" :key="index" class="h-fit border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col gap-y-3">
                 <!-- quiz header -->
                 <div class="flex items-center justify-between">
@@ -24,6 +24,9 @@
                     <Icon icon="mdi-light:eye" class="text-blue-500 text-xl cursor-pointer" />
                 </div>
             </div>
+        </div>
+        <div v-else>
+            <p class="text-center">No quiz to show</p>
         </div>
 
         <!-- newquiz component -->

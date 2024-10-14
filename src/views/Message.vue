@@ -2,10 +2,10 @@
     <div class="flex flex-col overflow-hidden">
         <div v-if="user" class="flex items-center gap-x-5 mb-2">
             <img v-if="user?.photoURL" :src="user?.photoURL" alt="profilepic" class="rounded-full h-16 aspect-square">
-            <div>
+            <router-link :to="{ name: 'userDetails', param: { id: $route.params.id } }">
                 <h1 class="text-xl">{{ user?.displayName }}</h1>
                 <p class="text-xs text-gray-300 dark:text-gray-300/55">{{ user?.email }}</p>
-            </div>
+            </router-link>
         </div>
         <div v-else class="flex items-center gap-x-5 mb-2">
             <div class="h-16 aspect-square rounded-full bg-gray-300 animate-pulse"></div>
@@ -15,8 +15,11 @@
             </div>
         </div>
         <div v-if="user" class="h-full flex flex-col-reverse py-5 gap-y-5">
-            <div v-for="message in messages" :key="message" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded w-fit" :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
-                {{ message.message }}
+            <div v-for="message in messages" :key="message" class="w-fit space-y-1"  :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
+                <div class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                    {{ message.message }}
+                </div>
+                <p class="text-[.6rem] capitalize">{{ formatDate(message.messageAt) }}</p>
             </div>
         </div>
         <div v-else class="h-full flex flex-col-reverse py-5 gap-y-5">
@@ -40,6 +43,14 @@ import { db } from '../plugins/firebase';
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../store'
 import { indexedDBLocalPersistence } from 'firebase/auth';
+import { formatRelative } from 'date-fns'
+
+const formatDate = (firestoreTimestamp) => {
+    const date = firestoreTimestamp.toDate()
+
+    return formatRelative(date, new Date())
+
+}
 
 const authStore = useAuthStore()
 
@@ -73,6 +84,7 @@ const sendMessage = async (receiverID) => {
         receiveBy: receiverID,
         message: message.value,
         messageAt: Timestamp.now(),
+        isRead: false,
       });
       message.value = ''
     } catch (error) {

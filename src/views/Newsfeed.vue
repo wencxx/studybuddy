@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <!-- post footer -->
-                    <div class="mt-1 flex items-center gap-x-3">
+                    <div class="mt-1 flex items-center justify-between gap-x-3">
                         <div class="flex gap-x-2">
                             <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
                             <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
@@ -146,8 +146,9 @@ const getPosts = (postId) => {
     onSnapshot(
         query(collection(db, 'posts'), orderBy('postedAt', 'desc')), 
         (snapshot) => {
-        posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    });
+            posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
+    );
 }
 
 // view post images

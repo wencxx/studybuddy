@@ -55,7 +55,7 @@
       </div>
       <div>
         <div>
-          <button v-if="!posting" class="float-end bg-gray-300 dark:bg-gray-600 w-1/5 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700">Add</button>
+          <button v-if="!adding" class="float-end bg-gray-300 dark:bg-gray-600 w-1/5 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700">Add</button>
           <button v-else class="float-end bg-gray-300 dark:bg-gray-600 w-fit px-2 py-1 rounded hover:bg-gray-400/55 hover:dark:bg-gray-700 animate-pulse" disabled>Adding</button>
         </div>
       </div>
@@ -196,10 +196,12 @@ const addQuiz = () => {
 
 
 // add to databas
+const adding = ref(false)
 const quizRef = collection(db, 'quizzes')
 
 const submitQuiz = async () => {
     try {
+        adding.value = true
         const snapshot = await addDoc(quizRef, {
             quizTitle: quizTitle.value,
             dueDate: dueDate.value,
@@ -221,6 +223,7 @@ const submitQuiz = async () => {
         quizzes.value = []
         quizTitle.value = ''
         dueDate.value = ''
+        adding.value = false
     } catch (error) {
         console.log(error)
     }
