@@ -52,7 +52,6 @@ const router = useRouter()
 const signinWithGoogle = async () => {
     try {
         const result = await signInWithPopup(auth, provider)
-
         const user = result.user
         const token = user.accessToken
 
@@ -60,7 +59,10 @@ const signinWithGoogle = async () => {
         localStorage.setItem('token', token)
         
         authStore.login(token)
-        router.push('/home')
+        
+        const redirect = router.currentRoute.value.query.redirect || '/home';
+        // router.push('/home')
+        router.push(redirect);
     } catch (error) {
         console.error(error.message)
     }
@@ -83,7 +85,9 @@ const login = async () => {
         localStorage.setItem('token', token)
         
         authStore.login(token)
-        router.push('/home')
+        const redirect = router.currentRoute.value.query.redirect || '/home';
+        // router.push('/home')
+        router.push(redirect);
     } catch (error) {
         console.error(error)
     }finally{

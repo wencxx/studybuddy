@@ -21,6 +21,14 @@ const routes = [
         }
     },
     {
+        path: '/requests',
+        name: 'requests',
+        component: () => import('../views/Request.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/post-details',
         name: 'postDetails',
         component: () => import('../views/PostDetails.vue'),
@@ -35,6 +43,11 @@ const routes = [
         meta: {
             requiresAuth: true
         }
+    },
+    {
+        path: '/take-quiz/:id',
+        name: 'takeQuiz',
+        component: () => import('../views/TakeQuiz.vue')
     },
     {
         path: '/notes',
@@ -86,16 +99,15 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore()
+    const authStore = useAuthStore();
 
-    if(to.meta.requiresAuth && !authStore.isAuthenticated){
-        next({ name: 'login' });
-    }else if(to.path == '/' && authStore.isAuthenticated){
-        next({ name: 'newsfeed'})
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        next({ name: 'login', query: { redirect: to.fullPath } });
+    } else if (to.path === '/' && authStore.isAuthenticated) {
+        next({ name: 'newsfeed' });
+    } else {
+        next();
     }
-    else{
-        next()
-    }
-})
+});
 
 export default router

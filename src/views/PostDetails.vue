@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="bg-white border dark:border-none dark:bg-gray-900 h-full p-4 space-y-5 overflow-y-auto">
+        <div v-if="postDetails.id" class="h-full p-4 space-y-5 overflow-y-auto">
             <div class="border border-gray-300 dark:border-gray-100/10 h-fit rounded-xl p-3 flex flex-col gap-y-5">
                 <!-- post header -->
                 <div class="flex items-center gap-x-2">
@@ -130,17 +130,20 @@
                     <Icon icon="carbon:send-alt" class="text-2xl cursor-pointer" @click="addComment(postDetails?.id)" />
                 </div>
             </div>
-        </div>
+        </div> 
+        <postSkeletonLoader v-else :noOfSkeleton="1" />
     </div>
 </template>
 
 <script setup>
+import postSkeletonLoader from '../components/postSkeletonLoader.vue'
 import { ref, defineProps, defineEmits, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
 import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer, getDoc, doc} from 'firebase/firestore'
+import postLoaderVue from '../components/postSkeletonLoader.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()

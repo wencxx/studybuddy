@@ -31,7 +31,7 @@
                 <Icon icon="tdesign:user-error-1" class="text-xl" />
                 <span>Decline</span>
             </button>
-            <button v-if="isCollaborated(user?.userId) === 'requested'" class="w-1/2 border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
+            <button v-if="isCollaborated(user?.userId) === 'requested'" class="w-1/2 border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2" @click="toggleCollab('cancel', user?.userId)">
                 <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
                 <span>cancel</span>
             </button>
@@ -345,6 +345,42 @@ const toggleCollab = async (type, id) => {
                 console.log(`Item removed from document ID: ${docs.id}`);
             });
         } catch (error) {
+            console.error(error)
+        }
+    }else if(type === 'cancel'){
+        try {
+            // remove from outgoing request
+            const removeFromOutgoing = query(
+                collection(db, 'users'), 
+                where('userId', '==', currentUser.value?.uid) 
+            );
+
+            const querySnapshot = await getDocs(removeFromOutgoing);
+
+            querySnapshot.forEach(async (docs) => {
+                const docRef = doc(db, 'users', docs.id);
+                await updateDoc(docRef, {
+                    outgoingCollabRequest: arrayRemove(id)
+                });
+                console.log(`Item removed from document ID: ${docs.id}`);
+            });
+
+            // remove from outgoing request
+            const removeFromIncoming = query(
+                collection(db, 'users'), 
+                where('userId', '==', id) 
+            );
+
+            const querySnapshot2 = await getDocs(removeFromIncoming);
+
+            querySnapshot2.forEach(async (docs) => {
+                const docRef = doc(db, 'users', docs.id);
+                await updateDoc(docRef, {
+                    incomingCollabRequest: arrayRemove(currentUser.value?.uid)
+                });
+                console.log(`Item removed from document ID: ${docs.id}`);
+            });
+        }catch(error) {
             console.error(error)
         }
     }

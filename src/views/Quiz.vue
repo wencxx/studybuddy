@@ -27,7 +27,9 @@
                         </div>
                     </div>
                     <div class="group relative">
-                        <Icon icon="codicon:debug-start" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <router-link :to="{ name: 'takeQuiz', params: { id: quiz.id } }">
+                            <Icon icon="codicon:debug-start" class="text-blue-500/70 text-lg cursor-pointer" />
+                        </router-link>
                         <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Start quiz</p>
                         </div>

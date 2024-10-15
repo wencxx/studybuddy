@@ -25,7 +25,7 @@
                 </router-link>
             </div>
         </div>
-        <div v-else>
+        <div v-else class="text-center">
             No messages to show
         </div>
     </div>
