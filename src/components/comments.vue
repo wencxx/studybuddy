@@ -110,7 +110,7 @@
                                 <Icon icon="mdi:user" class="text-gray-500 text-lg dark:text-white" />
                             </div>
                             <div class="border dark:border-gray-100/10 rounded-lg  w-full h-9 flex items-center p-2">
-                                <input type="text" v-model="reply" :placeholder="`reply to ${comment.name.split(' ')[0]}'s comment`" class="h-full w-full dark:bg-transparent focus:outline-none">
+                                <input @keyup.enter="addReply(comment.id)" type="text" v-model="reply" :placeholder="`reply to ${comment.name.split(' ')[0]}'s comment`" class="h-full w-full dark:bg-transparent focus:outline-none">
                                 <Icon icon="carbon:send-alt" class="text-2xl cursor-pointer" @click="addReply(comment.id)" />
                             </div>
                         </div>
@@ -127,7 +127,7 @@
                     <Icon icon="mdi:user" class="text-gray-500 text-xl dark:text-white" />
                 </div>
                 <div class="border dark:border-gray-100/10 rounded-lg  w-full h-9 flex items-center p-2">
-                    <input type="text" :placeholder="`Comment to ${postDetails.name.split(' ')[0]}'s post`" v-model="comment" class="h-full w-full dark:bg-transparent focus:outline-none">
+                    <input @keyup.enter="addComment(postDetails.id)" type="text" :placeholder="`Comment to ${postDetails.name.split(' ')[0]}'s post`" v-model="comment" class="h-full w-full dark:bg-transparent focus:outline-none">
                     <Icon icon="carbon:send-alt" class="text-2xl cursor-pointer" @click="addComment(postDetails.id)" />
                 </div>
             </div>
@@ -203,6 +203,7 @@ const addComment = async (postId) => {
         console.log(error)
     }
 }
+
 
 // add reply
 const reply = ref('')

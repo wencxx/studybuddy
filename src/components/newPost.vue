@@ -8,7 +8,7 @@
       </div>
       <!-- modal body -->
       <div>
-        <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="postDetails" autofocus></textarea>
+        <textarea  @keyup.enter="post" class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="postDetails" autofocus></textarea>
         <!-- media list -->
         <div v-if="tempImgUrls.length > 0" class=" flex gap-x-2 my-1">
             <div v-for="(img, index) in tempImgUrls" :key="index" class="relative group bg-gray-100/10 rounded overflow-hidden" :class="{ '!hidden': index > 4 }">

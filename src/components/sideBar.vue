@@ -9,6 +9,12 @@
                     </router-link>
                 </li>
                 <li>
+                    <router-link :to="{ name: 'newsfeed' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="mingcute:home-3-fill" class="text-2xl" />
+                        <span class="text-xl">Request</span>
+                    </router-link>
+                </li>
+                <li>
                     <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="mingcute:task-2-fill" class="text-2xl" />
                         <span class="text-xl">Quiz</span>

@@ -20,8 +20,18 @@
                 </div>
                 <!-- quiz footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <Icon icon="mdi-light:share" class="text-blue-500 text-xl cursor-pointer" />
-                    <Icon icon="mdi-light:eye" class="text-blue-500 text-xl cursor-pointer" />
+                    <div class="group relative">
+                        <Icon icon="mdi-light:share" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">Share</p>
+                        </div>
+                    </div>
+                    <div class="group relative">
+                        <Icon icon="codicon:debug-start" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">Start quiz</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
