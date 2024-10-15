@@ -1,6 +1,6 @@
 <template>
-    <div class="absolute bg-white/55 dark:bg-black/55 backdrop-blur w-screen h-screen left-0 top-0 z-20 flex items-center justify-center">
-        <div class="bg-white border dark:border-none dark:bg-gray-900 h-full w-5/6 md:w-4/6 lg:w-3/5 xl:w-2/5 p-4 space-y-5 overflow-y-auto">
+    <div>
+        <div class="bg-white border dark:border-none dark:bg-gray-900 h-full p-4 space-y-5 overflow-y-auto">
             <div class="border border-gray-300 dark:border-gray-100/10 h-fit rounded-xl p-3 flex flex-col gap-y-5">
                 <!-- post header -->
                 <div class="flex items-center gap-x-2">
@@ -8,14 +8,11 @@
                     <div v-else class="rounded-full border flex items-center justify-center p-2">
                         <Icon icon="mdi:user" class="text-gray-500 text-xl dark:text-white" />
                     </div>
-                    <div class="-space-y-1">
+                    <div class="-space-y-1" v-if="postDetails.userId">
                         <router-link :to="{ name: 'userDetails', params: { id: postDetails.userId } }">
                             <h2 class="font-medium">{{ postDetails.name }}</h2>
                         </router-link>
                         <p class="text-xs dark:text-gray-100/65">{{ formatDate(postDetails.postedAt) }}</p>
-                    </div>
-                    <div class=" ml-auto bg-gray-100/10 p-1 rounded hover:bg-gray-100/5 cursor-pointer" @click="closeModal">
-                        <Icon icon="mdi:close" class="text-xl" />
                     </div>
                 </div>
                 <!-- post Details -->
@@ -71,7 +68,7 @@
                                 <div v-for="reply in replies[comment.id]" :key="reply.id" class="flex flex-col gap-y-1">
                                     <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
                                         <div class="flex items-center gap-x-2">
-                                            <img v-if="reply.photoURL" :src="reply.photoURL" alt="profile picture" class="w-9 aspect-square rounded-full">
+                                            <img v-if="reply?.photoURL" :src="reply?.photoURL" alt="profile picture" class="w-9 aspect-square rounded-full">
                                             <div v-else class="rounded-full border flex items-center justify-center p-2">
                                                 <Icon icon="mdi:user" class="text-gray-500 text-lg dark:text-white" />
                                             </div>
@@ -107,7 +104,7 @@
                             </div>
                         </div> -->
                         <div v-if="repliesIndex.includes(comment.id) || replyToComment.includes(comment.id)" class="flex items-center gap-x-2 pl-12">
-                            <img v-if="currentUser.photoURL" :src="currentUser.photoURL" alt="profile picture" class="w-8 aspect-square rounded-full">
+                            <img v-if="currentUser?.photoURL" :src="currentUser?.photoURL" alt="profile picture" class="w-8 aspect-square rounded-full">
                             <div v-else class="rounded-full border flex items-center justify-center p-1">
                                 <Icon icon="mdi:user" class="text-gray-500 text-lg dark:text-white" />
                             </div>
@@ -124,13 +121,13 @@
             </div>
             <!-- add comment -->
             <div class="flex items-center gap-x-2 mt-4">
-                <img v-if="currentUser.photoURL" :src="currentUser.photoURL" alt="profile picture" class="w-9 aspect-square rounded-full">
+                <img v-if="currentUser?.photoURL" :src="currentUser?.photoURL" alt="profile picture" class="w-9 aspect-square rounded-full">
                 <div v-else class="rounded-full border flex items-center justify-center p-1">
                     <Icon icon="mdi:user" class="text-gray-500 text-xl dark:text-white" />
                 </div>
                 <div class="border dark:border-gray-100/10 rounded-lg  w-full h-9 flex items-center p-2">
-                    <input @keyup.enter="addComment(postDetails.id)" type="text" :placeholder="`Comment to ${postDetails.name.split(' ')[0]}'s post`" v-model="comment" class="h-full w-full dark:bg-transparent focus:outline-none">
-                    <Icon icon="carbon:send-alt" class="text-2xl cursor-pointer" @click="addComment(postDetails.id)" />
+                    <input @keyup.enter="addComment(postDetails?.id)" type="text" :placeholder="`Comment to ${postDetails.name?.split(' ')[0]}'s post`" v-model="comment" class="h-full w-full dark:bg-transparent focus:outline-none">
+                    <Icon icon="carbon:send-alt" class="text-2xl cursor-pointer" @click="addComment(postDetails?.id)" />
                 </div>
             </div>
         </div>
@@ -139,19 +136,18 @@
 
 <script setup>
 import { ref, defineProps, defineEmits, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
-import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer } from 'firebase/firestore'
+import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer, getDoc, doc} from 'firebase/firestore'
 
+const route = useRoute()
 const authStore = useAuthStore()
 
 // currentUser details
 const currentUser = computed(() => authStore.currentUser)
 
-const { postDetails } = defineProps({
-    postDetails: Object
-})
 
 const emit = defineEmits([
     'closeModal'
@@ -162,11 +158,30 @@ const closeModal = () => {
     emit('closeModal')
 }
 
+const postDetails = ref({})
+
+// get post 
+const postRef = doc(db, 'posts', route.query.id)
+const getPost = async () => {
+    try {
+        const snapshot = await getDoc(postRef)
+
+        postDetails.value = {
+            id: snapshot.id,
+            ...snapshot.data()
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 // format date
 const formatDate = (firestoreTimestamp) => {
-     const date = firestoreTimestamp.toDate();
+    if(firestoreTimestamp){
+        const date = firestoreTimestamp.toDate();
   
-    return formatDistanceToNow(date, { addSuffix: true });
+        return formatDistanceToNow(date, { addSuffix: true });
+    }
 }
 
 // view replies
@@ -201,11 +216,11 @@ const addComment = async (postId) => {
         })
 
         comment.value = ''
+        countComments()
     } catch (error) {
         console.log(error)
     }
 }
-
 
 // add reply
 const reply = ref('')
@@ -258,7 +273,7 @@ const getComments = async () => {
         onSnapshot(
             query(
                 commRefs, 
-                where('postId', '==', postDetails.id),
+                where('postId', '==', postDetails.value.id),
                 limit(queryLimit.value)
             ),
             (snapshot) => {
@@ -269,6 +284,23 @@ const getComments = async () => {
                 countComments()
             }
         )
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// count comments
+const commentCount = ref(0)
+
+const countComments = async () => {
+    try {
+        const q = query(
+            commRefs, 
+            where('postId', '==', postDetails.value.id)
+        )
+        const snapshot = await getCountFromServer(q)
+
+        commentCount.value = snapshot.data().count
     } catch (error) {
         console.log(error)
     }
@@ -290,7 +322,6 @@ const getReplies = async (commentId) => {
                     id: doc.id,
                     ...doc.data()
                 }))
-                countComments()
             }
         )
     } catch (error) {
@@ -298,32 +329,17 @@ const getReplies = async (commentId) => {
     }
 }
 
-// count comments
-const commentCount = ref(0)
-
-const countComments = async () => {
-    try {
-        const q = query(
-            commRefs, 
-            where('postId', '==', postDetails.id)
-        )
-        const snapshot = await getCountFromServer(q)
-
-        commentCount.value = snapshot.data().count
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-onMounted(() => {
-    getComments()
-    
-    watch(queryLimit, () => {
+onMounted(async () => {
+    await getPost()
+    if(postDetails.value){
         getComments()
-    })
-    watch(comments, () => {
-        comments.value.forEach(comm => getReplies(comm.id))
-    })
+        watch(queryLimit, () => {
+            getComments()
+        })
+        watch(comments, () => {
+            comments.value.forEach(comm => getReplies(comm.id))
+        })
+    }
 })
 </script>
 

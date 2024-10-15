@@ -21,6 +21,14 @@ const routes = [
         }
     },
     {
+        path: '/post-details',
+        name: 'postDetails',
+        component: () => import('../views/PostDetails.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/quiz',
         name: 'quiz',
         component: () => import('../views/Quiz.vue'),

@@ -16,7 +16,7 @@
         <!-- post -->
         <div v-if="currentUser">
             <div v-if="posts && posts.length > 0" class="flex flex-col gap-y-5 mb-5">
-                <div v-for="post in posts" :key="post.id" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
+                <div v-for="post in posts" :key="post.id"  @click.self="viewPost(post.id)" class="w-full rounded-xl border shadow-sm dark:shadow-none dark:border-gray-100/10 p-4 flex flex-col gap-y-3">
                     <!-- post header -->
                     <div class="flex items-center gap-x-3">
                         <img v-if="post.photoURL" :src="post.photoURL" alt="profile pic" class="h-9 aspect-square rounded-full" />
@@ -35,6 +35,7 @@
                                 <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="editPostSigle(post.id)">Edit</button>
                                 <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="deletePost(post.id)">Delete</button>
                                 <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white">report</button>
+                                <button  class="text-sm hover:text-gray-500 hover:dark:text-white" @click="copyToClipboard(post.id)">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -151,6 +152,14 @@ const getPosts = (postId) => {
     );
 }
 
+const viewPost = (postId) => {
+    router.push({
+        path: '/post-details',
+        query: {
+            id: postId
+        }
+    })
+}
 // view post images
 const viewImagesModal = ref(false)
 const imagesToview = ref([])
@@ -248,6 +257,16 @@ const countComments = async (postId) => {
         commentCounts.value[postId] = 0
     }
 };
+
+const copyToClipboard = async (userId) => {
+    const url = `${window.location.origin}/post-details?id=${userId}`;
+    try {
+    await navigator.clipboard.writeText(url);
+    alert('Link copied to clipboard!');
+    } catch (err) {
+    console.error('Failed to copy: ', err);
+    }
+}
 
 </script>
 
