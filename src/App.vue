@@ -102,7 +102,7 @@
       <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
         <router-view :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
-        <!-- <rightSideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" /> -->
+        <rightSideBar :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
       </div>
   </div>
 </template>
@@ -118,7 +118,7 @@ import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit } fro
 
 // components import
 import sideBar from './components/sideBar.vue'
-// import rightSideBar from './components/rightSideBar.vue'
+import rightSideBar from './components/collaboratedSideBar.vue'
 
 const router = useRouter()
 const route = useRoute()

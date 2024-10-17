@@ -46,7 +46,7 @@
                     <!-- images -->
                     <div v-if="post.postImages && post.postImages?.length > 0" class="grid grid-cols-2 gap-1"  :class="{'!grid-cols-1': post.postImages?.length === 1}">
                         <div v-for="(imageUrl, index) in post.postImages" :key="index" class="relative rounded cursor-pointer overflow-hidden" :class="{ 'hidden': index > 3, 'col-span-2': post.postImages?.length === 3 && index === 2 }" @click="viewPostImages(post.postImages, index)" >
-                            <img :src="imageUrl" alt="image posted" class="w-full aspect-square" :class="{ '!aspect-video': post.postImages?.length === 3 && index === 2, 'h-96': post.postImages?.length === 1 }" loading="lazy">
+                            <img :src="imageUrl" alt="image posted" class="w-full aspect-square object-cover" :class="{ '!aspect-video': post.postImages?.length === 3 && index === 2, 'h-96': post.postImages?.length === 1 }" loading="lazy">
                             <div v-if="post.postImages?.length > 4 && index === 3" class="absolute top-0 left-0 w-full h-full bg-black/75 flex items-center justify-center">
                                 <p class="text-3xl">+{{ post.postImages?.length - 4 }}</p>
                             </div>
@@ -54,8 +54,10 @@
                     </div>
                     <!-- post footer -->
                     <div class="mt-1 flex items-center justify-between gap-x-3">
-                        <div class="flex gap-x-2">
-                            <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
+                        <div class="flex gap-x-1">
+                            <Icon v-if="post.reacts?.includes(currentUser?.uid)" icon="material-symbols-light:favorite"  class="text-red-500 text-2xl dark:text-red-500 cursor-pointer" @click="removeReact(post.id)" />
+                            <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(post.id)" />
+                            <p class="text-sm text-gray-500 cursor-pointer">{{ post.reacts?.length || 0 }}</p>
                             <!-- <share-network
                                 network="messenger"
                                 :url="`https://studybuddy-livid.vercel.app/user-details/${post.userId}`"
@@ -100,7 +102,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
-import { onSnapshot, collection, updateDoc, arrayUnion, query, orderBy, deleteDoc, doc, getCountFromServer, where } from 'firebase/firestore'
+import { onSnapshot, collection, updateDoc, arrayUnion, arrayRemove, query, orderBy, deleteDoc, doc, getCountFromServer, where } from 'firebase/firestore'
 
 onMounted(() => {
     getPosts()
@@ -148,6 +150,7 @@ const viewPost = (postId) => {
         }
     })
 }
+
 // view post images
 const viewImagesModal = ref(false)
 const imagesToview = ref([])
@@ -185,20 +188,6 @@ const formatDate = (firestoreTimestamp) => {
     return formatDistanceToNow(date, { addSuffix: true });
 }
 
-const requestCollaboration = async (uid) => {
-    const userRef = doc(db, 'users', userId);
-
-    try {
-        await updateDoc(userRef, {
-            friends: arrayUnion(uid)
-        });
-        console.log('Friend added successfully!');
-    } catch (error) {
-        console.error('Error adding friend: ', error);
-    }
-}
-
-
 // view comments
 const toggledComment = ref(false)
 const postDetails = ref(null)
@@ -225,7 +214,6 @@ const toggleComment = (postDets) => {
 }
 
 // count comments by post
-
 const commentCounts = ref({})
 
 const countComments = async (postId) => {
@@ -254,6 +242,29 @@ const copyToClipboard = async (userId) => {
     } catch (err) {
     console.error('Failed to copy: ', err);
     }
+}
+
+// react to post
+const react = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayUnion(currentUser.value.uid)
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}
+
+const removeReact = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayRemove(currentUser.value.uid)
+        })
+    } catch (error) {
+        console.log(error)
+    } 
 }
 
 </script>

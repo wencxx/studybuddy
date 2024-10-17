@@ -9,7 +9,7 @@
                     <!-- question -->
                     <p class="text-lg">{{ index + 1 }}. {{ quiz.question }}</p>
                     <!-- answer base on item typee -->
-                    <div v-if="quiz.quizType === 'mc'" class="flex gap-7 pl-5">
+                    <div v-if="quiz.quizType === 'mc'" class="flex flex-wrap gap-7 pl-5">
                         <div v-for="choice in quiz.choices" :key="choice" class="flex items-center gap-x-2">
                             <input type="radio" :name="index" class="h-4 aspect-square">
                             <label>{{ choice }}</label>
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="mt-10">
-                    <button class="bg-blue-500 hover:bg-blue-600 rounded min-w-[15%] ml-auto flex justify-center" >Submit</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 rounded w-1/3 py-1 lg:w-1/5 ml-auto flex justify-center" >Submit</button>
                 </div>
             </div>
         </div>

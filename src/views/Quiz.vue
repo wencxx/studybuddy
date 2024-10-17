@@ -64,7 +64,6 @@ const quizRef = collection(db, 'quizzes')
 
 // get quizzes
 const getQuizzes = async () => {
-    console.log('bwesit')
     const q = query(
         quizRef,
         and(
