@@ -75,7 +75,7 @@
                 <!-- images -->
                 <div v-if="post.postImages && post.postImages?.length > 0" class="grid grid-cols-2 gap-1"  :class="{ 'col-span-2': post.postImages?.length === 3 && index === 2, '!grid-cols-1': post.postImages?.length === 1}">
                     <div v-for="(imageUrl, index) in post.postImages" :key="index" class="relative rounded cursor-pointer overflow-hidden" :class="{ 'hidden': index > 3 }" @click="viewPostImages(post.postImages, index)" >
-                        <img :src="imageUrl" alt="image posted" class="w-full aspect-square" :class="{ 'aspect-video': post.postImages?.length === 3 && index === 2, 'h-96': post.postImages?.length === 1 }" loading="lazy">
+                        <img :src="imageUrl" alt="image posted" class="w-full aspect-square object-cover" :class="{ 'aspect-video': post.postImages?.length === 3 && index === 2, 'h-96': post.postImages?.length === 1 }" loading="lazy">
                         <div v-if="post.postImages?.length > 4 && index === 3" class="absolute top-0 left-0 w-full h-full bg-black/75 flex items-center justify-center">
                             <p class="text-3xl">+{{ post.postImages?.length - 4 }}</p>
                         </div>
@@ -83,12 +83,23 @@
                 </div>
                 <!-- post footer -->
                 <div class="mt-1 flex items-center justify-between">
-                    <div class="flex gap-x-2">
-                        <Icon icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" />
-                        <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
-                    </div>  
+                    <div class="flex gap-x-1">
+                            <Icon v-if="post.reacts?.includes(currentUser?.uid)" icon="material-symbols-light:favorite"  class="text-red-500 text-2xl dark:text-red-500 cursor-pointer" @click="removeReact(post.id)" />
+                            <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(post.id)" />
+                            <p class="text-sm text-gray-500 cursor-pointer">{{ post.reacts?.length || 0 }}</p>
+                            <!-- <share-network
+                                network="messenger"
+                                :url="`https://studybuddy-livid.vercel.app/user-details/${post.userId}`"
+                                title="This is a post"
+                                description="description"
+                                v-slot="{ share }"
+                            >
+                                <span @click="share">Share on Facebook</span>
+                            </share-network> -->
+                            <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
+                        </div> 
                     <div>
-                        <p @click="toggleComment(post)" class="text-xs text-gray-400 cursor-pointer">{{ commentCounts[post.id] }} comments</p>
+                        <p @click="toggleComment(post)" class="text-xs text-gray-400 cursor-pointer">{{ commentCounts[post.id] || 0 }} comments</p>
                     </div>
                 </div>
             </div>
@@ -123,7 +134,7 @@ import comments from '../components/comments.vue'
 import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
-import { collection, query, where, getDocs, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
 import { db } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
@@ -193,16 +204,21 @@ const toggleComment = (postDets) => {
 const posts = ref([])
 
 const getUserPosts = async () => {
-  const q = query(
-    collection(db, 'posts'),
-    where('userId', '==', route.params.id),
-    orderBy('postedAt', 'desc')
-  );
+  onSnapshot(
+    query(
+        collection(db, 'posts'),
+        where('userId', '==', route.params.id),
+        orderBy('postedAt', 'desc')
+    ),
+    (snapshot) => {
+        posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    }
+  )
 
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    posts.value.push({ id: doc.id, ...doc.data() })
-  });
+//   const querySnapshot = await getDocs(q);
+//   querySnapshot.forEach((doc) => {
+//     posts.value.push({ id: doc.id, ...doc.data() })
+//   });
 };
 
 // edit post
@@ -397,6 +413,7 @@ const togglePostMenu = (postId) => {
     }
 }
 
+// count comments
 const commentCounts = ref({})
 
 const countComments = async (postId) => {
@@ -416,6 +433,29 @@ const countComments = async (postId) => {
         commentCounts.value[postId] = 0
     }
 };
+
+// react to post
+const react = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayUnion(currentUser.value.uid)
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}
+
+const removeReact = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayRemove(currentUser.value.uid)
+        })
+    } catch (error) {
+        console.log(error)
+    } 
+}
 
 onMounted(() => {
     getUser();

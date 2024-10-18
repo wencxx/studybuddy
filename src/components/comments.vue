@@ -33,7 +33,21 @@
                 </div>
                 <!-- post footer -->
                 <div class="flex justify-between">
-                    <Icon icon="mdi-light:heart" class="text-xl dark:text-gray-100/55 cursor-pointer hover:text-gray-500 hover:dark:text-gray-100/65" />
+                    <div class="flex gap-x-1">
+                        <Icon v-if="postDetails.reacts?.includes(currentUser?.uid)" icon="material-symbols-light:favorite"  class="text-red-500 text-2xl dark:text-red-500 cursor-pointer" @click="removeReact(postDetails.id)" />
+                        <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(postDetails.id)" />
+                        <p class="text-sm text-gray-500 cursor-pointer">{{ postDetails.reacts?.length || 0 }}</p>
+                        <!-- <share-network
+                            network="messenger"
+                            :url="`https://studybuddy-livid.vercel.app/user-details/${post.userId}`"
+                            title="This is a post"
+                            description="description"
+                            v-slot="{ share }"
+                        >
+                            <span @click="share">Share on Facebook</span>
+                        </share-network> -->
+                        <!-- <Icon name="material-symbols-light:favorite"  class="text-red-500 text-xl cursor-pointer" /> -->
+                    </div>  
                     <p class="dark:text-gray-100/55 text-sm">{{ commentCount }} comments</p>
                 </div>
             </div>
@@ -142,7 +156,7 @@ import { ref, defineProps, defineEmits, computed, onMounted, watch } from 'vue'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
-import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer } from 'firebase/firestore'
+import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer, doc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore'
 
 const authStore = useAuthStore()
 
@@ -313,6 +327,36 @@ const countComments = async () => {
     } catch (error) {
         console.log(error)
     }
+}
+
+// react to post
+const reacts = computed(() => postDetails.reacts)
+
+const react = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayUnion(currentUser.value.uid)
+        })
+
+        reacts.value.push(currentUser.value.uid)
+
+    } catch (error) {
+        console.log(error)
+    } 
+}
+
+const removeReact = async (postId) => {
+    const docRef = doc(db, 'posts', postId)
+    try {
+        await updateDoc(docRef, {
+            reacts: arrayRemove(currentUser.value.uid)
+        })
+
+        reacts.value.pop(currentUser.value.uid)
+    } catch (error) {
+        console.log(error)
+    } 
 }
 
 onMounted(() => {

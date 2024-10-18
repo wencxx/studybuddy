@@ -98,18 +98,11 @@ import viewImages from '../components/viewPostImages.vue'
 import postSkeletonLoader from '../components/postSkeletonLoader.vue'
 // mods
 import { formatDistanceToNow } from 'date-fns'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
 import { onSnapshot, collection, updateDoc, arrayUnion, arrayRemove, query, orderBy, deleteDoc, doc, getCountFromServer, where } from 'firebase/firestore'
-
-onMounted(() => {
-    getPosts()
-    watch(posts, () => {
-        posts.value.forEach(post => countComments(post.id))
-    })
-})
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -133,8 +126,10 @@ const togglePostMenu = (postId) => {
 const posts = ref(null)
 
 // get realtime posts
+let unsubscribe
+
 const getPosts = (postId) => {
-    onSnapshot(
+    unsubscribe = onSnapshot(
         query(collection(db, 'posts'), orderBy('postedAt', 'desc')), 
         (snapshot) => {
             posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -266,6 +261,21 @@ const removeReact = async (postId) => {
         console.log(error)
     } 
 }
+
+getPosts()
+
+onMounted(() => {
+    watch(posts, () => {
+        posts.value.forEach(post => countComments(post.id))
+    })
+})
+
+onUnmounted(() => {
+    if(unsubscribe){
+        unsubscribe()
+        console.log('unsubscribe')
+    }
+})
 
 </script>
 

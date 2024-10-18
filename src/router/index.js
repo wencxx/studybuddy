@@ -58,6 +58,21 @@ const routes = [
         }
     },
     {
+        path: '/marketplace',
+        name: 'marketplace',
+        component: () => import('../views/Marketplace.vue'),
+        meta: {
+            requiresAuth: true
+        },
+        children: [
+            {
+                path: 'selling',
+                name: 'selling',
+                component: () => import('../views/child/sellProduct.vue')
+            }
+        ]
+    },
+    {
         path: '/user-details/:id',
         name: 'userDetails',
         component: () => import('../views/UserDetails.vue'),
