@@ -60,7 +60,7 @@ const routes = [
     {
         path: '/marketplace',
         name: 'marketplace',
-        component: () => import('../views/Marketplace.vue'),
+        component: () => import('../views/MarketPlace.vue'),
         meta: {
             requiresAuth: true
         },
