@@ -20,7 +20,7 @@
                 </div>
                 <!-- quiz footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <div class="group relative">
+                    <div class="group relative" @click="shareQuiz(quiz.id)">
                         <Icon icon="mdi-light:share" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Share</p>
@@ -38,8 +38,29 @@
             </div>
         </div>
         <div v-else>
-            <p class="text-center">No quiz to show</p>
+            <p class="text-center -ml-5">No quiz to show</p>
         </div>
+
+        <!-- share to -->
+        <div v-if="showShareModal" class="absolute top-0 left-0 w-screen h-screen bg-black/10 z-30 flex items-center justify-center">
+            <div class="w-3/4 lg:w-1/4 h-1/2 bg-white rounded-md p-5 text-black flex flex-col gap-y-10">
+                <!-- header -->
+                <div class="flex items-center justify-between">
+                    <h1 class="text-lg">Share to</h1>
+                    <Icon icon="mdi:close" class="text-xl cursor-pointer" @click="showShareModal = false" />
+                </div>
+                <!-- body -->
+                <div class="flex flex-col gap-y-2 overflow-auto">
+                    <div v-for="user in props.collaborated" :key="user.userId" class="flex items-center gap-x-2">
+                        <img :src="user.photoURL" alt="profile pic" class="rounded-full w-10 aspect-square">
+                        <h1 class="text-lg">{{ user.displayName }}</h1>
+                        <button v-if="sharedTo.includes(user.userId)" class="text-blue-500 border border-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Shared</button>
+                        <button v-else class="text-white bg-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Share</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
 
         <!-- newquiz component -->
         <newQuiz v-if="addNewPost" @closeModal="addNewPost = false" @click.self="addNewPost = false" @newQuizDetails="insertNewQuiz" />
@@ -51,7 +72,11 @@ import newQuiz from '../components/newQuiz.vue'
 import { useAuthStore } from '../store'
 import { onMounted, ref, computed, watch, defineProps } from 'vue'
 import { db } from '../plugins/firebase'
-import{ collection, doc, getDocs, query, where, and } from 'firebase/firestore'
+import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp } from 'firebase/firestore'
+
+const props = defineProps({
+    collaborated: Array
+})
 
 const authStore = useAuthStore()
 
@@ -93,6 +118,35 @@ const insertNewQuiz = (data) => {
     })
 }
 
+// share quiz
+const quizToShare = ref('')
+const showShareModal = ref(false)
+const sharedTo = ref([])
+
+const shareQuiz = (quizId) => {
+    quizToShare.value = quizId
+    showShareModal.value = true
+}
+
+const messageRef = collection(db, 'messages')
+
+const shareToUser = async (userId) => {
+    try {
+        const snapshot = await addDoc(messageRef, {
+            message: `${window.location.origin}/take-quiz/${quizToShare.value}`,
+            receiveBy: userId,
+            sendBy: currentUser.value.uid,
+            isRead: false,
+            messageAt: Timestamp.now(),
+            type: 'Share'
+        })
+
+        sharedTo.value.push(userId)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 onMounted(() => {
     if (currentUser.value && currentUser.value.uid) {
         getQuizzes();
@@ -104,6 +158,7 @@ onMounted(() => {
         }
     })
 })
+
 const addNewPost = ref(false)
 </script>
 

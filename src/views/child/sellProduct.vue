@@ -2,19 +2,19 @@
     <div class="flex flex-col gap-y-10 overflow-auto">
         <h1 class="text-lg">Create a listing</h1>
         <div>
-            {{ productData }}
+            <p v-if="hasEmptyFields" class="bg-red-500 pl-2 rounded mb-2 py-1" >Input product details</p>
             <form @submit.prevent="createListing" class="flex flex-col gap-y-7">
                 <div class="flex flex-col gap-y-2">
                     <label>Product Name</label>
-                    <input type="text" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productName" required>
+                    <input type="text" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productName">
                 </div>
                 <div class="flex flex-col gap-y-2">
                     <label>Product Description</label>
-                    <textarea type="text" class="w-2/4 min-h-16 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none p-2" v-model="productData.productDescription" required></textarea>
+                    <textarea type="text" class="w-2/4 min-h-16 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none p-2" v-model="productData.productDescription"></textarea>
                 </div>
                 <div class="flex flex-col gap-y-2">
                     <label>Product Price</label>
-                    <input type="text" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productPrice" required>
+                    <input type="number" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productPrice">
                 </div>
                 <div class="flex flex-col gap-y-2">
                     <label>Product Category</label>
@@ -30,7 +30,7 @@
                 </div>
                 <div class="flex flex-col gap-y-2">
                     <label>Product Quantity</label>
-                    <input type="number" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productQuantity" required>
+                    <input type="number" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productQuantity">
                 </div>
                 <div class="flex flex-col gap-y-2">
                     <label>Product Image (Atleast one image)</label>
@@ -38,15 +38,19 @@
                         <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-2xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" />
                         <p class="text-sm">Choose product image</p>
                     </div>
-                    <input id="imageInput" type="file" class="hidden" accept=".jpg, .png, .jpeg" @change="handleImageUpload" multiple required :disabled="tempUrl.length === 3">
+                    <input id="imageInput" type="file" class="hidden" accept=".jpg, .png, .jpeg" @change="handleImageUpload" multiple :disabled="tempUrl.length === 3">
                 </div>
                 <div class="grid grid-cols-3 gap-x-2">
-                    <div v-for="(image, index) in tempUrl" :key="index" class="w-full">
-                        <img :src="image" alt="product image" class="w-full object-cover !aspect-square">
+                    <div v-for="(image, index) in tempUrl" :key="index" class="w-full relative group">
+                        <img :src="image" alt="product image" class="w-full object-cover !aspect-square rounded">
+                        <div class="bg-black/55 w-fit p-1 rounded-full absolute top-2 right-2 hidden group-hover:block cursor-pointer" @click="removeImage(index)">
+                            <Icon icon="mdi:close" />
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-end mt-5">
-                    <button class="bg-blue-500 rounded w-1/5 py-1">Create a listing</button>
+                <div class="flex justify-end my-5">
+                    <button v-if="!creatingList" class="bg-blue-500 rounded w-fit px-3 py-1">Create a listing</button>
+                    <button v-else class="bg-blue-500 rounded w-fit px-3 py-1 animate-pulse" disabled>Creating..</button>
                 </div>
             </form>
         </div>
@@ -54,10 +58,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { db, storage } from '../../plugins/firebase'
 import { collection, addDoc, Timestamp } from  'firebase/firestore'
 import { ref as storageRef, getDownloadURL, uploadBytes } from  'firebase/storage'
+import { useAuthStore } from '../../store'
+
+const authStore = useAuthStore()
+
+const currentUser = computed(() => authStore.currentUser)
 
 // handle image upload
 const toggleImageInput = () => {
@@ -74,24 +83,71 @@ const handleImageUpload = () => {
     })
 }
 
+// handle image remove
+const removeImage = (i) => {
+    images.value.splice(i, 1)
+    tempUrl.value.splice(i, 1)
+}
+
 
 const productData = ref({
     productName: '',
     productPrice: '',
     productDescription: '',
     productCategory: '',
-    productQuantity: null
+    productQuantity: null,
+    imagesUrl: []
 })
 
 
 // sell product
 const marketplaceRef = collection(db, 'marketplace')
 
-const createListing = () => {
+const creatingList = ref(false)
+const hasEmptyFields = ref(false)
+
+// staorege ref
+const createListing = async () => {
     try {
-        
+        creatingList.value = true
+        hasEmptyFields.value = false
+
+        if(Object.values(productData.value).some(field => !field)) {
+            console.log('Input product details')
+            creatingList.value = false
+            hasEmptyFields.value = true
+            return
+        } 
+
+        if(images.value.length > 0){
+            for(const image of images.value){
+                const imageRef = storageRef(storage, `marketplace/${image.name}`)
+                await uploadBytes(imageRef, image)
+                const imageUrl = await getDownloadURL(imageRef)
+                productData.value.imagesUrl.push(imageUrl)
+            }
+        }
+
+        const snapshot = await addDoc(marketplaceRef, {
+            ...productData.value,
+            userId: currentUser.value.uid
+        })
+
+        productData.value = {
+            productName: '',
+            productPrice: '',
+            productDescription: '',
+            productCategory: '',
+            productQuantity: null,
+            imagesUrl: []
+        }
+
+        images.value = []
+        tempUrl.value = []
+
+        creatingList.value = false
     } catch (error) {
-        
+        console.log(error)
     }
 }
 </script>

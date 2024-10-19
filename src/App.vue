@@ -101,8 +101,8 @@
       <!-- body -->
       <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
-        <router-view :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
-        <rightSideBar :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
+        <router-view :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
+        <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
       </div>
   </div>
 </template>
@@ -212,6 +212,13 @@ const signout = async () => {
   } catch (error) {
     console.log(error)
   }
+}
+
+// get collabs from sidebar
+const collaborated = ref([])
+
+const getCollabs = (data) => {
+  collaborated.value = data
 }
 
 const toggleDarkmode = () => {

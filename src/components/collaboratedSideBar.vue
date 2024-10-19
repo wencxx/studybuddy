@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watch, ref } from 'vue'
+import { defineProps, onMounted, watch, ref, defineEmits } from 'vue'
 import { db } from '../plugins/firebase'
 import { collection, getDocs, where, limit, query, doc, arrayRemove, arrayUnion, updateDoc, onSnapshot } from 'firebase/firestore'
 
@@ -28,6 +28,8 @@ import { collection, getDocs, where, limit, query, doc, arrayRemove, arrayUnion,
 const props = defineProps({
     userId: String
 })
+
+const emit = defineEmits(['collabs'])
 
 
 const userRef = collection(db, 'users')
@@ -85,6 +87,8 @@ const getUsers = async () => {
                 })
             })
         })
+
+        emit('collabs', users.value)
     } catch (error) {
         console.log(error)
     }

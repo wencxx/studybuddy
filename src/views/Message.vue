@@ -17,7 +17,10 @@
         <div v-if="user" class="h-full flex flex-col-reverse py-5 gap-y-5">
             <div v-for="message in messages" :key="message" class="w-fit space-y-1"  :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
                 <div class="flex items-center">
-                    <div class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                    <a :href="message.message" v-if="message.type === 'Share'" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded underline text-blue-500"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                        {{ message.message }}
+                    </a>
+                    <div v-else class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
                     </div>
                 </div>

@@ -89,6 +89,7 @@ const post = async () => {
 
     try {
       posting.value = true
+      
       if(images.value.length > 0){
         for(const image of images.value){
           const imageRef =  storageRef(storage, `posts/${image.name}`)

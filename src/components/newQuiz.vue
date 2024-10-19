@@ -15,7 +15,7 @@
             </div>
             <div class="flex flex-col w-1/2 gap-y-2">
                 <label>Due date</label>
-                <input type="date" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Due date" v-model="dueDate" @change="checkDueDate">
+                <input type="datetime-local" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Due date" v-model="dueDate" @change="checkDueDate">
             </div>
       </div>
       <div class="flex flex-col items-end gap-y-4">
