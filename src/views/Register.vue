@@ -22,10 +22,10 @@
                 <label>Password</label>
                 <input type="password" placeholder="Password" v-model="password" class="rounded pl-2 h-10  bg-transparent border border-gray-300 dark:border-gray-100/10" required>
             </div>
-            <div class="w-full flex justify-between">
+            <!-- <div class="w-full flex justify-between">
                 <p class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Forgot password</p>
                 <router-link :to="{ name: 'login' }" class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Sign in</router-link>
-            </div>
+            </div> -->
             <button v-if="!registering" class="bg-gray-100 mt-1 dark:bg-gray-800 hover:bg-gray-200 hover:dark:bg-gray-700 w-full h-10 rounded text-sm">Sign up</button>
             <button v-else class="bg-gray-100 mt-1 dark:bg-gray-800 hover:bg-gray-200 hover:dark:bg-gray-700 w-full h-10 rounded px-6 pb-2 pt-2.5 text-sm font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
             type="button" disabled
@@ -42,11 +42,11 @@
                 </div>
                 Registering
             </button>
-            <p class="text-sm capitalize">or sign in using</p>
+            <!-- <p class="text-sm capitalize">or sign in using</p>
             <button @click="signinWithGoogle" type="button" class="border dark:border-gray-100/10 hover:bg-gray-200 hover:dark:bg-gray-800/10 w-full h-10 rounded flex items-center justify-center">
                 <Icon icon="flat-color-icons:google" />
                 <span>oogle</span>
-            </button>
+            </button> -->
         </form>
     </div>
 </template>
@@ -110,22 +110,22 @@ const signup = async () => {
 }
 
 // sign in using gmail
-const signinWithGoogle = async () => {
-    try {
-        const result = await signInWithPopup(auth, provider)
+// const signinWithGoogle = async () => {
+//     try {
+//         const result = await signInWithPopup(auth, provider)
 
-        const user = result.user
-        const token = user.accessToken
+//         const user = result.user
+//         const token = user.accessToken
 
-        localStorage.setItem('auth', true)
-        localStorage.setItem('token', token)
+//         localStorage.setItem('auth', true)
+//         localStorage.setItem('token', token)
         
-        authStore.login(token)
-        router.push('/home')
-    } catch (error) {
-        console.error(error.message)
-    }
-}
+//         authStore.login(token)
+//         router.push('/home')
+//     } catch (error) {
+//         console.error(error.message)
+//     }
+// }
 </script>
 
 <style scoped>

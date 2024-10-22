@@ -11,7 +11,12 @@
                     <div class="border border-blue-500 w-10 aspect-square rounded-lg flex items-center justify-center">
                         <Icon icon="fluent-mdl2:task-list" class="text-blue-500 text-2xl" />
                     </div>
-                    <Icon icon="mdi:dots-horizontal" class="text-gray-500 text-2xl dark:text-white ml-auto" />
+                    <div class="relative">
+                        <Icon @click="showDeleteModal(index)" icon="mdi:dots-horizontal" class="text-gray-500 text-2xl dark:text-white ml-auto cursor-pointer" />
+                        <div v-if="deleteModal === index" class="absolute top-[110%] right-0 bg-neutral-500 p-1 rounded">
+                            <button class="text-sm" @click="deleteQuiz(quiz.id, index)">delete</button>
+                        </div>
+                    </div>
                 </div>
                 <!-- quiz body -->
                 <div class="flex flex-col gap-y-2">
@@ -72,11 +77,33 @@ import newQuiz from '../components/newQuiz.vue'
 import { useAuthStore } from '../store'
 import { onMounted, ref, computed, watch, defineProps } from 'vue'
 import { db } from '../plugins/firebase'
-import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp } from 'firebase/firestore'
+import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp, deleteDoc } from 'firebase/firestore'
 
 const props = defineProps({
     collaborated: Array
 })
+
+const deleteModal = ref('')
+
+const showDeleteModal = (index) => {
+    if(deleteModal.value === index){
+        deleteModal.value = ''
+    }else{
+        deleteModal.value = index
+    }
+}
+
+const deleteQuiz = async (quizId, index) => {
+    const docRef = doc(db, 'quizzes', quizId)
+    try {
+        await deleteDoc(docRef)
+
+        quizzes.value.splice(index, 1)
+        deleteModal.value = ''
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const authStore = useAuthStore()
 

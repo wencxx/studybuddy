@@ -2,13 +2,14 @@
     <div class="mx-auto flex items-center justify-center gap-y-10">
         <form @submit.prevent="login" class="w-full md:w-4/5 xl:w-2/3 border border-gray-300 dark:border-gray-100/10 p-5 rounded-md flex flex-col gap-y-4 items-center">
             <h1 class="text-2xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
+            <p v-if="invalidCredentials" class="text-sm bg-red-500 w-full pl-2 rounded py-1">Invalid Credentials</p>
             <div class="flex flex-col gap-y-1 w-full">
                 <label>Email</label>
                 <input type="text" v-model="email" placeholder="Email" class="rounded pl-2 h-10 bg-transparent border border-gray-300 dark:border-gray-100/10" required>
             </div>
             <div class="flex flex-col gap-y-1 w-full">
                 <label>Password</label>
-                <input type="text" placeholder="Password" v-model="password" class="rounded pl-2 h-10  bg-transparent border border-gray-300 dark:border-gray-100/10" required>
+                <input type="password" placeholder="Password" v-model="password" class="rounded pl-2 h-10  bg-transparent border border-gray-300 dark:border-gray-100/10" required>
             </div>
             <div class="w-full flex justify-between">
                 <p class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Forgot password</p>
@@ -30,11 +31,11 @@
                 </div>
                 Signing in
             </button>
-            <p class="text-sm capitalize">or sign in using</p>
+            <!-- <p class="text-sm capitalize">or sign in using</p>
             <button @click="signinWithGoogle" type="button" class="border dark:border-gray-100/10 hover:bg-gray-200 hover:dark:bg-gray-800/10 w-full h-10 rounded flex items-center justify-center">
                 <Icon icon="flat-color-icons:google" />
                 <span>oogle</span>
-            </button>
+            </button> -->
         </form>
     </div>
 </template>
@@ -49,34 +50,36 @@ import { ref } from 'vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-const signinWithGoogle = async () => {
-    try {
-        const result = await signInWithPopup(auth, provider)
-        const user = result.user
-        const token = user.accessToken
+// const signinWithGoogle = async () => {
+//     try {
+//         const result = await signInWithPopup(auth, provider)
+//         const user = result.user
+//         const token = user.accessToken
 
-        localStorage.setItem('auth', true)
-        localStorage.setItem('token', token)
+//         localStorage.setItem('auth', true)
+//         localStorage.setItem('token', token)
         
-        authStore.login(token)
+//         authStore.login(token)
         
-        const redirect = router.currentRoute.value.query.redirect || '/home';
-        // router.push('/home')
-        router.push(redirect);
-    } catch (error) {
-        console.error(error.message)
-    }
-}
+//         const redirect = router.currentRoute.value.query.redirect || '/home';
+//         // router.push('/home')
+//         router.push(redirect);
+//     } catch (error) {
+//         console.error(error.message)
+//     }
+// }
 
 const email = ref('')
 const password = ref('')
 
 const loggingIn = ref(false)
 
+const invalidCredentials = ref(false)
+
 const login = async () => {
     try {
         loggingIn.value = true
-        const userCredentials = await signInWithEmailAndPassword(auth, email.value, password.value)
+        const userCredentials = await signInWithEmailAndPassword(auth, `${email.value}@gmail.com`, password.value)
         const user = userCredentials.user
 
         const token = user.accessToken
@@ -89,7 +92,9 @@ const login = async () => {
         // router.push('/home')
         router.push(redirect);
     } catch (error) {
-        console.error(error)
+        if(error.code === 'auth/invalid-credential'){
+            invalidCredentials.value = true
+        }
     }finally{
         loggingIn.value = false
     }

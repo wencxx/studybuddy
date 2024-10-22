@@ -76,6 +76,7 @@
             <p v-if="posts && posts.length === 0" class="text-center"> No post to show</p>
         </div>
         <!-- skeleton -->
+        <p v-else-if="currentUser && posts && posts.length === 0" class="text-center">No post to show</p>
         <postSkeletonLoader v-else :noOfSkeleton="5" />
 
         <!-- add new post component -->

@@ -154,8 +154,6 @@ onAuthStateChanged(auth, (user) => {
     authStore.currentUser = user
     addUser(user.uid, user.displayName, user.email, user.photoURL)
     getUserDetails(user.uid)
-  }else{
-    console.log('not logged in')
   }
 })
 
