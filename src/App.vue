@@ -82,15 +82,17 @@
               <p class="text-[.6rem]">Notifications</p>
             </div>
           </button>
-          <div v-if="authStore.isAuthenticated" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <router-link :to="{ name: 'userDetails', params: { id: currentUser.uid } }" class="!bg-transparent" v-if="currentUser && currentUser.photoURL">
+          <div v-if="authStore.isAuthenticated && currentUser" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <router-link :to="{ name: 'userDetails', params: { id: currentUser?.uid } }" class="!bg-transparent" v-if="currentUser && currentUser.photoURL">
               <img
                   :src="currentUser.photoURL"
                   alt="profile pic"
                   class="rounded-full w-7 aspect-square"
               />
             </router-link>
-            <Icon v-else icon="mdi:user" class="text-white text-3xl border rounded-full p-1" />
+            <router-link v-else :to="{ name: 'userDetails', params: { id: currentUser?.uid } }" class="!bg-transparent">
+              <Icon icon="mdi:user" class="text-white text-3xl border rounded-full p-1" />
+            </router-link>
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem] text-center">Profile</p>
             </div>

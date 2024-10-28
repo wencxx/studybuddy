@@ -13,7 +13,7 @@
                 </router-link>
             </div>
             <div v-else class="mt-5">
-                <p class="text-sm">Start collaborating now...</p>
+                <p class="text-sm">Start collaborating now</p>
             </div>
         </div>
     </div>

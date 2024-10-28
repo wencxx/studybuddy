@@ -55,13 +55,16 @@
                     <Icon icon="mdi:close" class="text-xl cursor-pointer" @click="showShareModal = false" />
                 </div>
                 <!-- body -->
-                <div class="flex flex-col gap-y-2 overflow-auto">
+                <div v-if="props.collaborated.length" class="flex flex-col gap-y-2 overflow-auto">
                     <div v-for="user in props.collaborated" :key="user.userId" class="flex items-center gap-x-2">
                         <img :src="user.photoURL" alt="profile pic" class="rounded-full w-10 aspect-square">
                         <h1 class="text-lg">{{ user.displayName }}</h1>
                         <button v-if="sharedTo.includes(user.userId)" class="text-blue-500 border border-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Shared</button>
                         <button v-else class="text-white bg-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Share</button>
                     </div>
+                </div>
+                <div v-else class="flex flex-col gap-y-2 overflow-auto">
+                    <p class="text-center text-sm">No collaboration</p>
                 </div>
             </div>
         </div>

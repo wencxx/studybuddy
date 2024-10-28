@@ -4,8 +4,8 @@
             <h1 class="text-2xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
             <p v-if="invalidCredentials" class="text-sm bg-red-500 w-full pl-2 rounded py-1">Invalid Credentials</p>
             <div class="flex flex-col gap-y-1 w-full">
-                <label>Email</label>
-                <input type="text" v-model="email" placeholder="Email" class="rounded pl-2 h-10 bg-transparent border border-gray-300 dark:border-gray-100/10" required>
+                <label>Student Number</label>
+                <input type="text" v-model="email" placeholder="Student Number" class="rounded pl-2 h-10 bg-transparent border border-gray-300 dark:border-gray-100/10" required>
             </div>
             <div class="flex flex-col gap-y-1 w-full">
                 <label>Password</label>
@@ -13,7 +13,7 @@
             </div>
             <div class="w-full flex justify-between">
                 <p class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Forgot password</p>
-                <router-link :to="{ name: 'register' }" class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Sign up</router-link>
+                <!-- <router-link :to="{ name: 'register' }" class="text-sm cursor-pointer hover:text-blue-500 hover:underline">Sign up</router-link> -->
             </div>
             <button v-if="!loggingIn" class="bg-gray-100 mt-1 dark:bg-gray-800 hover:bg-gray-200 hover:dark:bg-gray-700 w-full h-10 rounded uppercase text-sm">Sign in</button>
             <button v-else  class="bg-gray-100 mt-1 dark:bg-gray-800 hover:bg-gray-200 hover:dark:bg-gray-700 w-full h-10 rounded px-6 pb-2 pt-2.5 text-sm font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
@@ -95,6 +95,7 @@ const login = async () => {
         if(error.code === 'auth/invalid-credential'){
             invalidCredentials.value = true
         }
+        console.log(error)
     }finally{
         loggingIn.value = false
     }

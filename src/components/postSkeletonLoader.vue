@@ -30,6 +30,6 @@
 import { defineProps } from 'vue'
 
 const props = defineProps({
-    noOfSkeleton: Int16Array
+    noOfSkeleton: Number
 })
 </script>

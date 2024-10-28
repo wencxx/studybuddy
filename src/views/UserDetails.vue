@@ -1,16 +1,32 @@
 <template>
-    <div v-if="user" class="flex flex-col gap-y-5 mx-auto px-10 md:px-20" id="container">
-        <div class="flex items-center gap-x-5">
-            <img v-if="user.photoURL" :src="user.photoURL" alt="profilePic" class="rounded-full">
-            <div v-else class="h-16 aspect-square border rounded-full flex items-center justify-center">
-                <Icon icon="fluent:person-16-filled" class="text-5xl" />
+    <div v-if="user" class="flex flex-col gap-y-5 mx-auto px-10 md:px-20" id="container" @click.self="toggledProfileMenu = false">
+        <div class="flex items-center gap-x-5 relative">
+            <div class="relative group">
+                <img v-if="user.photoURL" :src="user.photoURL" alt="profilePic" class="h-16 aspect-square rounded-full object-cover">
+                <div v-else class="h-16 aspect-square border rounded-full flex items-center justify-center">
+                    <Icon icon="fluent:person-16-filled" class="text-5xl" />
+                </div>
+                <div v-if="uploadingProfile" class="h-16 aspect-square border rounded-full absolute top-0 left-0 bg-gray-100/25 animate-pulse"></div>
+                <div class="h-16 aspect-square rounded-full absolute top-0 left-0 bg-black/50 cursor-pointer hidden group-hover:flex items-center justify-center">
+                    <Icon icon="weui:camera-outlined" class="text-2xl" @click="chooseProfilePic" />
+                    <input type="file" accept=".jpg, .png, .jpeg" class="hidden" id="fileInput" @change="changeImage">
+                </div>
             </div>
             <div>
                 <h2 class="text-2xl">{{ user.displayName }}</h2>
                 <p class="text-sm">{{ user.email }}</p>
             </div>
+            <div class="absolute right-0 top-3 flex flex-col items-end">
+                <Icon icon="mdi:dots-vertical" class="text-2xl text-gray-100/50 cursor-pointer" @click="toggledProfileMenu = true" />
+                <div v-if="toggledProfileMenu" class="bg-neutral-800 p-2 rounded">
+                    <p class="text-xs cursor-pointer" @click="passwordModal = true">change password</p>
+                </div>
+            </div>
         </div>
-        <p class="text-sm text-gray-100/55">Bio here soon to come!</p>
+        <div>
+            <p class="text-sm text-gray-100/55">Course: {{ user.course }}</p>
+            <p class="text-sm text-gray-100/55">Year & Section: {{ user.yearSection }}</p>
+        </div>
         <div v-if="user.userId !== currentUser.uid" class="flex gap-x-5">
             <div class="w-1/2" :class="{ '!w-full': isCollaborated(user?.userId) === 'request'}">
                 <button class="border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 w-full h-full capitalize rounded flex justify-center items-center gap-x-2" v-if="isCollaborated(user?.userId) === 'collaborated'" @click="toggleCollab('collaborated', user?.userId)">
@@ -111,16 +127,49 @@
         <editPost v-if="editPostModal" :postDetails="postToEdit" @click.self="editPostModal = false" @closeModal="editPostModal = false" />
         <!-- view post images -->
         <viewImages @closeModal="viewImagesModal = false" v-if="viewImagesModal" :images="imagesToview" :imageIndex="imageIndex"  />
+        <!-- profile image view to change -->
+        <div v-if="displaySelectedProfile" class="w-screen h-screen bg-black/10 fixed top-0 left-0 z-20 flex flex-col items-center justify-center gap-y-10">
+            <img :src="tempUrl" class="border h-1/2 aspect-square rounded-full object-cover bg-white">
+            <div class="flex gap-x-5">
+                <button class="border border-blue-500 text-blue-500 px-5 py-1 rounded">Cancel</button>
+                <button class="px-5 py-1 rounded bg-blue-500" @click="uploadProfilePic">Upload</button>
+            </div>
+        </div>
+        <div v-if="uploadingProfile" class="fixed right-5 bottom-5 flex items-center gap-x-2 bg-blue-500 py-1 px-2 rounded">
+            <Icon icon="eos-icons:loading" />
+            <p>Uploading</p>
+        </div>
+        <!-- change password -->
+        <div v-if="passwordModal" class="w-screen h-screen bg-black/10 fixed top-0 left-0 z-20 flex flex-col items-center justify-center gap-y-10">
+            <form @submit.prevent="changePassword" class="bg-white rounded border p-3 text-black ">
+                <h1 class="text-center">Update Password</h1>
+                <div class="flex flex-col gap-y-1 mt-3">
+                    <label class="text-sm">Current password</label>
+                    <input type="password" class="rounded border h-8 pl-2" v-model="currentPassword">
+                </div>
+                <div class="flex flex-col gap-y-1 mt-3">
+                    <label class="text-sm">New Password</label>
+                    <input type="password" class="rounded border h-8 pl-2" v-model="newPassword">
+                </div>
+                <div class="flex gap-x-2 justify-end items-center !mt-5">
+                    <button class="border border-blue-500 px-2 rounded text-blue-500">Cancel</button>
+                    <button class="border border-transparent bg bg-blue-500 px-2 rounded text-white">Change</button>
+                </div>
+            </form>
+        </div>
     </div>
     <div v-else class="flex flex-col gap-y-5 mx-auto px-10 md:px-20">
         <div class="flex items-center gap-x-5">
-            <div class="h-24 aspect-square bg-gray-300 rounded-full animate-pulse"></div>
+            <div class="h-16 aspect-square bg-gray-300 rounded-full animate-pulse"></div>
             <div>
                 <div class="h-7 w-40 bg-gray-300 animate-pulse rounded"></div>
                 <div class="h-4 w-32 bg-gray-300 animate-pulse rounded mt-2"></div>
             </div>
         </div>
-        <div class="h-4 w-32 bg-gray-300 animate-pulse rounded mt-2"></div>
+        <div class="mt-2 space-y-2">
+            <div class="h-4 w-32 bg-gray-300 animate-pulse rounded"></div>
+            <div class="h-4 w-32 bg-gray-300 animate-pulse rounded"></div>
+        </div>
         <div class="flex gap-x-2">
             <div class="w-1/2 h-8 bg-gray-300 animate-pulse rounded"></div>
             <div class="w-1/2 h-8 bg-gray-300 animate-pulse rounded"></div>
@@ -135,10 +184,13 @@ import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
 import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
-import { db } from '../plugins/firebase'; 
+import { db, storage, auth } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
-import { indexedDBLocalPersistence } from 'firebase/auth';
+import { indexedDBLocalPersistence, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+
+const toggledProfileMenu = ref(false)
 
 const authStore = useAuthStore()
 
@@ -160,7 +212,10 @@ const getUser = async () => {
 
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    user.value = doc.data();
+    user.value = {
+        id: doc.id,
+        ...doc.data()
+    };
   });
 };
 
@@ -456,6 +511,93 @@ const removeReact = async (postId) => {
         console.log(error)
     } 
 }
+
+// change profile picture
+const chooseProfilePic = () => {
+    const fileInput = document.getElementById('fileInput')
+
+    fileInput.click()
+}
+
+const displaySelectedProfile = ref(false)
+const img = ref(null)
+const tempUrl = ref('')
+
+const changeImage = () => {
+    const file = event.target.files[0]
+    const url = URL.createObjectURL(file)
+
+    img.value = file
+    tempUrl.value = url
+
+    displaySelectedProfile.value = true
+}
+
+const uploadingProfile = ref(false)
+
+const uploadProfilePic = async () => {
+    const docRef = doc(db, 'users', user.value.id);
+    const postRef = collection(db, 'posts');
+    const profileRef = storageRef(storage, `images/${img.value.name}`);
+    
+    try {
+        uploadingProfile.value = true;
+        displaySelectedProfile.value = false;
+        
+        await uploadBytes(profileRef, img.value);
+        const link = await getDownloadURL(profileRef);
+
+        await updateProfile(auth.currentUser, {
+            photoURL: link
+        });
+
+        await updateDoc(docRef, {
+            photoURL: link
+        });
+
+        const q = query(postRef, where('userId', '==', user.value.userId));
+        const snapshots = await getDocs(q);
+
+        snapshots.forEach(async (postDoc) => {
+            const postDocRef = doc(db, 'posts', postDoc.id);
+            await updateDoc(postDocRef, {
+                photoURL: link
+            });
+        });
+
+        uploadingProfile.value = false;
+        getUser();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const passwordModal = ref(false)
+
+const currentPassword = ref('')
+const newPassword = ref('')
+
+const changePassword = async () => {
+    const currUser = auth.currentUser;
+
+    if (!currUser) {
+        console.log('No user is signed in.');
+        return;
+    }
+
+    const credential = EmailAuthProvider.credential(currUser.email, currentPassword.value);
+    try {
+        await reauthenticateWithCredential(currUser, credential);
+        
+        await updatePassword(currUser, newPassword.value); 
+        
+        passwordModal.value = false
+        currentPassword.value = ''
+        newPassword.value = ''
+    } catch (error) {
+        console.error('Error updating password:', error);
+    }
+};
 
 onMounted(() => {
     getUser();
