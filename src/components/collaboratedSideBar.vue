@@ -5,7 +5,7 @@
             <div v-if="users.length > 0" class="flex flex-col gap-y-3 mt-5">
                 <router-link :to="{ name: 'userDetails', params: { id:user.userId } }" v-for="user in users" :key="user.id" class="flex items-center gap-x-3">
                     <div v-if="user.photoURL" class="w-10 rounded-full aspect-square overflow-hidden">
-                        <img :src="user.photoURL" alt="profile pic">
+                        <img :src="user.photoURL" alt="profile pic" class="w-full aspect-square">
                     </div>
                     <div v-else class="w-10 rounded-full aspect-square overflow-hidden flex items-center justify-center border">
                         <Icon icon="mdi:user" class="text-3xl" />

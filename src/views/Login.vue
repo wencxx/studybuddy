@@ -50,25 +50,6 @@ import { ref } from 'vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-// const signinWithGoogle = async () => {
-//     try {
-//         const result = await signInWithPopup(auth, provider)
-//         const user = result.user
-//         const token = user.accessToken
-
-//         localStorage.setItem('auth', true)
-//         localStorage.setItem('token', token)
-        
-//         authStore.login(token)
-        
-//         const redirect = router.currentRoute.value.query.redirect || '/home';
-//         // router.push('/home')
-//         router.push(redirect);
-//     } catch (error) {
-//         console.error(error.message)
-//     }
-// }
-
 const email = ref('')
 const password = ref('')
 

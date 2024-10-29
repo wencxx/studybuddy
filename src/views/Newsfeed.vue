@@ -34,7 +34,7 @@
                             <div :id="post.id" v-if="postMenu == post.id" class="flex flex-col w-fit items-start gap-y-[.2rem] absolute right-3 border border-gray-300 dark:border-gray-100/10 py-2 px-3 bg-white dark:bg-gray-900 rounded">
                                 <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="editPostSigle(post.id)">Edit</button>
                                 <button  v-if="post.userId == currentUser.uid" class="text-sm hover:text-gray-500 hover:dark:text-white" @click="deletePost(post.id)">Delete</button>
-                                <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white">report</button>
+                                <button  v-else class="text-sm hover:text-gray-500 hover:dark:text-white" @click="reportPost(post.id)">report</button>
                                 <button  class="text-sm hover:text-gray-500 hover:dark:text-white" @click="copyToClipboard(post.id)">Copy</button>
                             </div>
                         </div>
@@ -103,7 +103,11 @@ import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
-import { onSnapshot, collection, updateDoc, arrayUnion, arrayRemove, query, orderBy, deleteDoc, doc, getCountFromServer, where } from 'firebase/firestore'
+import { onSnapshot, collection, updateDoc, arrayUnion, arrayRemove, query, orderBy, deleteDoc, doc, getCountFromServer, where, addDoc } from 'firebase/firestore'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
+
+const $toast = useToast()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -175,6 +179,24 @@ const deletePost = async (postId) => {
     const postRef = doc(db, 'posts', postId)
 
     deleteDoc(postRef)
+}
+
+// report a post
+const reportrRef = collection(db, 'reports')
+
+const reportPost = async (postId) => {
+    try {
+        await addDoc(reportrRef, {
+            postId: postId,
+            reportedBy: currentUser.value?.uid,
+            reportedAt: new Date()
+        })
+
+        postMenu.value = ''
+        $toast.success('Post successfully reported')
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 // conver date to x time ago

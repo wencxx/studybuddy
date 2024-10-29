@@ -154,37 +154,9 @@ onAuthStateChanged(auth, (user) => {
   if(user){
     currentUser.value = user
     authStore.currentUser = user
-    addUser(user.uid, user.displayName, user.email, user.photoURL)
     getUserDetails(user.uid)
   }
 })
-
-const addUser = async (uid, name, email, photoURL) => {
-    try {
-        const userQuery = query(
-            collection(db, 'users'),
-            where('userId', '==', uid)
-        );
-
-        const querySnapshot = await getDocs(userQuery);
-
-      if (!querySnapshot.empty) {
-          return;
-      }
-
-      await addDoc(collection(db, 'users'), {
-        userId: uid,
-        displayName: name,
-        email: email,
-        photoURL: photoURL,
-        collabs: [],
-        incomingCollabRequest: [],
-        outgoingCollabRequest: []
-      });
-    } catch (error) {
-      console.error('Error adding user: ', error);
-    }
-}
 
 const getUserDetails = (uid) => {
   const notesQuery = query(
