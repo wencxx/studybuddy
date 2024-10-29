@@ -2,6 +2,9 @@
     <div class="flex flex-col overflow-hidden">
         <div v-if="user" class="flex items-center gap-x-5 mb-2">
             <img v-if="user?.photoURL" :src="user?.photoURL" alt="profilepic" class="rounded-full h-16 aspect-square">
+            <div v-else class="border rounded-full h-16 aspect-square flex items-center justify-center">
+                <Icon icon="mdi:user" class="text-3xl" />
+            </div>
             <router-link :to="{ name: 'userDetails', param: { id: $route.params.id } }">
                 <h1 class="text-xl">{{ user?.displayName }}</h1>
                 <p class="text-xs text-gray-300 dark:text-gray-300/55">{{ user?.email }}</p>
@@ -17,10 +20,10 @@
         <div v-if="user" class="h-full flex flex-col-reverse py-5 gap-y-5">
             <div v-for="message in messages" :key="message" class="w-fit space-y-1"  :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
                 <div class="flex items-center">
-                    <a :href="message.message" v-if="message.type === 'Share'" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded underline text-blue-500"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                    <a :href="message.message" v-if="message.type === 'Share'" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded underline text-white"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
                     </a>
-                    <div v-else class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                    <div v-else class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 text-white px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
                     </div>
                 </div>

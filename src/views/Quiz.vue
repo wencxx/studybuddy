@@ -21,10 +21,17 @@
                 <!-- quiz body -->
                 <div class="flex flex-col gap-y-2">
                     <h1 class="uppercase font-semibold line-clamp-1">{{ quiz.quizTitle }}</h1>
-                    <p class="line-clamp-4 text-sm"><span class="font-bold">Due:</span> {{ quiz.dueDate }}</p>
+                    <p class="line-clamp-4 text-sm"><span class="font-bold">Due:</span> {{ formatDate(quiz.dueDate) }}</p>
+                    <p class="line-clamp-4 text-sm"><span class="font-bold">Timer:</span> <span v-if="quiz.quizTimer">{{ quiz.quizTimer }} Minutes</span><span v-else>None</span></p>
                 </div>
                 <!-- quiz footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
+                    <div class="group relative" @click="viewAnswered(quiz.id)">
+                        <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-24 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">View Answered</p>
+                        </div>
+                    </div>
                     <div class="group relative" @click="shareQuiz(quiz.id)">
                         <Icon icon="mdi-light:share" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
@@ -68,6 +75,49 @@
                 </div>
             </div>
         </div>
+
+        <div @click.self="viewAnsweredModal = false" v-if="viewAnsweredModal" class="absolute top-0 left-0 w-screen h-screen bg-black/10 z-30 flex items-center justify-center">
+            <div class="w-3/4 lg:w-2/5 h-1/2 bg-white rounded-md p-5 text-black flex flex-col gap-y-10">
+                <div class="flex justify-end">
+                    <Icon icon="mdi:close" @click="viewAnsweredModal = false" class="text-xl cursor-pointer" />
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-start w-2/4">Name</th>
+                            <th class="text-start w-1/4">Score</th>
+                            <th class="text-start w-1/4">Time takes</th>
+                        </tr>
+                    </thead>
+                    <tbody v-if="!gettingAnswered && answered.length">
+                        <tr v-for="(answer, index) in answered" :key="index">
+                            <td>
+                               <div class="flex items-center gap-x-2">
+                                    <img :src="answer.photoURL" alt="profile pic" class="w-9 aspect-square rounded-full">
+                                    {{ answer.displayName }}
+                               </div>
+                            </td>
+                            <td>{{ answer.score }}/{{ answer.itemNumbers }}</td>
+                            <td>{{ answer.timeTakes }}</td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="!gettingAnswered && !answered.length">
+                        <tr>
+                            <td colspan="3" class="text-center">No answers to show</td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="gettingAnswered">
+                        <tr>
+                            <td colspan="3" class="text-center py-2">
+                                <div class="flex justify-center">
+                                    <Icon icon="eos-icons:bubble-loading" class="text-2xl" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         
 
         <!-- newquiz component -->
@@ -79,6 +129,7 @@
 import newQuiz from '../components/newQuiz.vue'
 import { useAuthStore } from '../store'
 import { onMounted, ref, computed, watch, defineProps } from 'vue'
+import moment from 'moment'
 import { db } from '../plugins/firebase'
 import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp, deleteDoc } from 'firebase/firestore'
 
@@ -98,8 +149,20 @@ const showDeleteModal = (index) => {
 
 const deleteQuiz = async (quizId, index) => {
     const docRef = doc(db, 'quizzes', quizId)
+    const answeredRef = collection(db, 'answeredQuiz')
     try {
         await deleteDoc(docRef)
+
+       const q = query(
+            answeredRef,
+            where('quizId', '==', quizId)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+        })
 
         quizzes.value.splice(index, 1)
         deleteModal.value = ''
@@ -174,6 +237,56 @@ const shareToUser = async (userId) => {
         sharedTo.value.push(userId)
     } catch (error) {
         console.log(error)
+    }
+}
+
+const formatDate = (date) => {
+    return moment(date).format('lll')
+}
+
+// get answered of quiz
+const gettingAnswered = ref(false)
+const answered = ref([])
+const viewAnsweredModal = ref(false)
+
+// doc reference
+const answeredRef = collection(db, 'answeredQuiz')
+const studentsRef = collection(db, 'users')
+
+const viewAnswered = async (quizId) => {
+    viewAnsweredModal.value = true
+    try {
+        answered.value = []
+        gettingAnswered.value = true 
+        
+        const q = query(
+            answeredRef,
+            where('quizId', '==', quizId)
+        )
+
+        const snapshots = await getDocs(q)
+        
+        for (const doc of snapshots.docs) {
+            const q2 = query(
+                studentsRef,
+                where('userId', '==', doc.data().userId)
+            )
+
+            const studentSnapshots = await getDocs(q2)
+
+            studentSnapshots.docs.forEach(stud => {
+                answered.value.push({
+                    id: doc.id,
+                    displayName: stud.data().displayName,
+                    photoURL: stud.data().photoURL,
+                    ...doc.data()
+                })
+            })
+        }
+    } catch (error) {
+        console.log(error)
+    }finally{
+        gettingAnswered.value = false
     }
 }
 

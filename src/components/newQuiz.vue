@@ -18,6 +18,12 @@
                 <input type="datetime-local" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Due date" v-model="dueDate" @change="checkDueDate">
             </div>
       </div>
+      <div class="flex gap-x-2">
+            <div class="flex flex-col w-1/2 gap-y-2">
+                <label>Timer</label>
+                <input type="number" step="1" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Minutes" v-model="quizTimer">
+            </div>
+      </div>
       <div class="flex flex-col items-end gap-y-4">
         <select @change="addItem(quizAddedType)" v-model="quizAddedType" class="text-black rounded h-7">
             <option value="" disabled>Add item</option>
@@ -137,6 +143,7 @@ const checkDueDate = () => {
 const quizTitle = ref('')
 const dueDate = ref('')
 const quizAddedType = ref('')
+const quizTimer = ref('')
 const question = ref('')
 const choices = ref([])
 const answer = ref('')
@@ -187,6 +194,7 @@ const addQuiz = () => {
         choices: choices.value,
         answer: answer.value,
     })
+
     addedItem.value = false
     quizAddedType.value = ''
     question.value = ''
@@ -204,6 +212,7 @@ const submitQuiz = async () => {
         adding.value = true
         const snapshot = await addDoc(quizRef, {
             quizTitle: quizTitle.value,
+            quizTimer: quizTimer.value,
             dueDate: dueDate.value,
             quizzes: quizzes.value,
             status: 'to do',

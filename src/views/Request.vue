@@ -1,10 +1,13 @@
 <template>
     <div>
         <h1 class="text-lg">Collab Requests</h1>
-        <div v-if="users.length > 0" class="grid grid-cols-4 gap-4 mt-5">
+        <div v-if="users.length > 0" class="grid grid-cols-3 gap-4 mt-5">
             <div v-for="(user, index) in users" :key="user.id" class="rounded-md overflow-hidden bg-gray-100 dark:bg-neutral-700">
                 <router-link :to="{ name: 'userDetails', params: { id: user.userId } }">
-                    <img :src="user.photoURL" alt="profile pic" class="w-full aspect-square">
+                    <img v-if="user.photoURL" :src="user.photoURL" alt="profile pic" class="w-full aspect-square">
+                    <div v-else class="w-full aspect-square flex items-center justify-center bg-gray-200 dark:bg-gray-100/10">
+                        <Icon icon="mdi:user" class="dark:text-white text-6xl" />
+                    </div>
                     <div class="p-1 px-2">
                         <h1 class="hover:underline">{{ user.displayName }}</h1>
                     </div>

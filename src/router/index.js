@@ -58,6 +58,11 @@ const routes = [
         }
     },
     {
+        path: '/note-details/:id',
+        name: 'noteDetails',
+        component: () => import('../views/ViewNotes.vue')
+    },
+    {
         path: '/marketplace',
         name: 'marketplace',
         component: () => import('../views/MarketPlace.vue'),

@@ -1,31 +1,79 @@
 <template>
-    <div class="flex flex-col gap-y-10">
+    <div class="flex flex-col gap-y-10 content pb-10">
         <div>
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewNote = true">New note</button>
         </div>
         <!-- notes -->
         <div v-if="notes.length > 0" class="grid md:grid-cols-2 gap-5">
-            <div v-for="(note, index) in notes" :key="index" class="h-fit border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col gap-y-3">
+            <div v-for="(note, index) in notes" :key="index" class="h-full border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col justify-between gap-y-3">
                 <!-- note header -->
                 <div class="flex items-center justify-between">
                     <div class="border border-blue-500 w-10 aspect-square rounded-lg flex items-center justify-center">
                         <Icon icon="ic:outline-note-alt" class="text-blue-500 text-2xl" />
                     </div>
-                    <Icon icon="mdi:dots-horizontal" class="text-gray-500 text-2xl dark:text-white ml-auto" />
+                    <div class="flex items-center justify-end gap-x-2 mt-2">
+                        <p class="text-xs">{{ formatDate(note.addedAt) }}</p> 
+                    </div>
                 </div>
                 <!-- note body -->
                 <div class="flex flex-col gap-y-2">
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
-                    <p class="line-clamp-4 text-sm">{{ note.details }}</p>
+                    <p class="line-clamp-3 text-sm">{{ note.details }}</p>
+                    <p v-if="note.notesImages.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages.length }} attachments</p>
                 </div>
                 <!-- note footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <Icon icon="material-symbols:calendar-month-outline" class="text-blue-500 text-xl" />
-                    <p class="text-xs">{{ formatDate(note.addedAt) }}</p> 
+                    <div class="group relative" @click="shareNote(note.id)">
+                        <Icon icon="mdi-light:share" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">Share</p>
+                        </div>
+                    </div>
+                    <div class="group relative" @click="deleteNote(note.id, index)">
+                        <Icon icon="mdi:trash-outline" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">Delete</p>
+                        </div>
+                    </div>
+                    <div class="group relative">
+                        <router-link :to="{ name: 'noteDetails', params: { id: note.id } }">
+                            <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-lg cursor-pointer" />
+                        </router-link>
+                        <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">View notes</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <p v-else class="text-center">No notes to show</p>
+
+        <!-- share to -->
+        <div v-if="showShareModal" class="absolute top-0 left-0 w-screen h-screen bg-black/10 z-30 flex items-center justify-center">
+            <div class="w-3/4 lg:w-1/4 h-1/2 bg-white rounded-md p-5 text-black flex flex-col gap-y-10">
+                <!-- header -->
+                <div class="flex items-center justify-between">
+                    <h1 class="text-lg">Share to</h1>
+                    <Icon icon="mdi:close" class="text-xl cursor-pointer" @click="showShareModal = false" />
+                </div>
+                <!-- body -->
+                <div v-if="props.collaborated.length" class="flex flex-col gap-y-2 overflow-auto">
+                    <div v-for="user in props.collaborated" :key="user.userId" class="flex items-center gap-x-2">
+                        <img v-if="user.photoURL" :src="user.photoURL" alt="profile pic" class="rounded-full w-10 aspect-square">
+                        <div v-else class="rounded-full w-10 aspect-square flex items-center justify-center border">
+                            <Icon icon="mdi:user" class="text-2xl" />
+                        </div>
+                        <h1 class="text-lg">{{ user.displayName }}</h1>
+                        <button v-if="sharedTo.includes(user.userId)" class="text-blue-500 border border-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Shared</button>
+                        <button v-else class="text-white bg-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Share</button>
+                    </div>
+                </div>
+                <div v-else class="flex flex-col gap-y-2 overflow-auto">
+                    <p class="text-center text-sm">No collaboration</p>
+                </div>
+            </div>
+        </div>
+
         <newNotes v-if="addNewNote" @click.self="addNewNote = false" @closeModal="addNewNote = false" />
     </div>
 </template>
@@ -34,7 +82,7 @@
 import newNotes from '../components/newNotes.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { computed, onMounted, ref, defineProps, toRef, watch } from 'vue'
-import { onSnapshot, query, orderBy, where, collection } from 'firebase/firestore'
+import { onSnapshot, query, orderBy, where, collection, deleteDoc, doc, addDoc, Timestamp } from 'firebase/firestore'
 import { db } from '../plugins/firebase'
 import { useAuthStore } from '../store'
 
@@ -46,7 +94,8 @@ const addNewNote = ref(false)
 const notes = ref([])
 
 const props = defineProps({
-    userId: String
+    userId: String,
+    collaborated: Array
 })
 
 onMounted(() => {
@@ -83,9 +132,53 @@ const formatDate = (firestoreTimestamp) => {
   
     return formatDistanceToNow(date, { addSuffix: true });
 }
+
+
+// share note
+const noteToShare = ref('')
+const showShareModal = ref(false)
+const sharedTo = ref([])
+
+const shareNote = (noteId) => {
+    noteToShare.value = noteId
+    showShareModal.value = true
+}
+
+const messageRef = collection(db, 'messages')
+
+const shareToUser = async (userId) => {
+    try {
+        const snapshot = await addDoc(messageRef, {
+            message: `${window.location.origin}/note-details/${noteToShare.value}`,
+            receiveBy: userId,
+            sendBy: currentUser.value.uid,
+            isRead: false,
+            messageAt: Timestamp.now(),
+            type: 'Share'
+        })
+
+        sharedTo.value.push(userId)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// delete doc
+const deleteNote = async (noteID, index) => {
+    const docRef = doc(db, 'notes', noteID)
+    try {
+        await deleteDoc(docRef)
+        
+        notes.value.splice(index, 1)
+z    } catch (error) {
+        console.log(error)
+    }
+}
 </script>
 
 
 <style scoped>
-
+.content::-webkit-scrollbar {
+    display: none;
+}
 </style>

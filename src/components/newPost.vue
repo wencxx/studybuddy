@@ -12,7 +12,7 @@
         <!-- media list -->
         <div v-if="tempImgUrls.length > 0" class=" flex gap-x-2 my-1">
             <div v-for="(img, index) in tempImgUrls" :key="index" class="relative group bg-gray-100/10 rounded overflow-hidden" :class="{ '!hidden': index > 4 }">
-              <img :src="img" alt="image to post" class="w-16 aspect-square">
+              <img :src="img" alt="image to post" class="w-16 aspect-square object-cover">
               <div class="absolute right-0 top-0 bg-gray-500 rounded-full hidden group-hover:block cursor-pointer">
                 <Icon icon="mdi:close" class="text-md" @click="removeImageToPost(img)" />
               </div>

@@ -13,7 +13,8 @@
             <div v-for="(group, person) in groupedMessages" :key="person">
                 <router-link :to="{ name: 'message', params: { id: person } }" class="flex items-center gap-x-4 cursor-pointer">
                     <div class="w-14 aspect-square !rounded-full">
-                        <img :src="group[0].photoURL" alt="profile pic" class="w-full h-full rounded-full">
+                        <img v-if="group[0].photoURL" :src="group[0].photoURL" alt="profile pic" class="w-full h-full rounded-full">
+                        <Icon v-else icon="mdi:user" class="border p-2 w-full h-full rounded-full" />
                     </div>
                     <div class="flex flex-col w-full">
                         <div class="flex items-center justify-between">
