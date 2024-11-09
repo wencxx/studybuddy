@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store'
+import homeView from '../views/Newsfeed.vue'
 
 const routes = [
     {
@@ -15,7 +16,7 @@ const routes = [
     {
         path: '/home',
         name: 'newsfeed',
-        component: () => import('../views/Newsfeed.vue'),
+        component: homeView,
         meta: {
             requiresAuth: true
         }

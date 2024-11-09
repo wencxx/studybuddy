@@ -82,7 +82,7 @@
 import newNotes from '../components/newNotes.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { computed, onMounted, ref, defineProps, toRef, watch } from 'vue'
-import { onSnapshot, query, orderBy, where, collection, deleteDoc, doc, addDoc, Timestamp } from 'firebase/firestore'
+import { onSnapshot, query, orderBy, where, collection, deleteDoc, doc, addDoc, Timestamp, updateDoc, arrayUnion } from 'firebase/firestore'
 import { db } from '../plugins/firebase'
 import { useAuthStore } from '../store'
 
@@ -144,17 +144,26 @@ const shareNote = (noteId) => {
     showShareModal.value = true
 }
 
-const messageRef = collection(db, 'messages')
+// notifications reference
+const notifRef = collection(db, 'notifications')
 
 const shareToUser = async (userId) => {
+    const notesDoc = doc(db, 'notes', noteToShare.value)
+
     try {
-        const snapshot = await addDoc(messageRef, {
-            message: `${window.location.origin}/note-details/${noteToShare.value}`,
-            receiveBy: userId,
-            sendBy: currentUser.value.uid,
-            isRead: false,
-            messageAt: Timestamp.now(),
-            type: 'Share'
+        await updateDoc(notesDoc, {
+           sharedTo: arrayUnion(userId)
+        })
+
+        await addDoc(notifRef, {
+            to: userId,
+            from: currentUser.value.uid,
+            name: currentUser.value.displayName,
+            photoURL: currentUser.value.photoURL,
+            link: `/note-details/${noteToShare.value}`,
+            notifiedAt: Timestamp.now(),
+            isView: false,
+            isRead: false
         })
 
         sharedTo.value.push(userId)
@@ -170,7 +179,7 @@ const deleteNote = async (noteID, index) => {
         await deleteDoc(docRef)
         
         notes.value.splice(index, 1)
-z    } catch (error) {
+    } catch (error) {
         console.log(error)
     }
 }

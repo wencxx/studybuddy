@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white font-inter dark:bg-gray-900 text-black dark:text-gray-300">
-      <header class="flex items-center justify-between h-[7dvh] w-full bg-white/0 sticky top-0 backdrop-blur border-b border-gray-100 dark:border-gray-100/10 px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] z-20">
+      <header class="flex items-center justify-between h-[7dvh] w-full bg-white/0 sticky top-0 backdrop-blur border-b border-gray-100 dark:border-gray-100/10 px-[5dvw] lg:px-[8dvw] xl:px-[15dvw] z-20">
         <!-- logo -->
         <div>
           <router-link :to="{ name: 'newsfeed' }">
@@ -75,8 +75,9 @@
             </div>
           </button>
           <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <router-link :to="{ name: 'notifications' }">
+            <router-link :to="{ name: 'notifications' }" class="relative">
               <Icon icon="ion:notifications" class="text-2xl text-gray-400 dark:text-gray-300" />
+              <span v-if="notViewNotifications > 0" class="absolute -top-1 -right-1 text-[0.6rem] bg-red-500 py-[0.05rem] px-[0.4rem] rounded-full text-white">{{ notViewNotifications }}</span>
             </router-link>
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem]">Notifications</p>
@@ -101,7 +102,7 @@
         </div>
       </header>
       <!-- body -->
-      <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[10dvw] xl:px-[15dvw] flex gap-x-2">
+      <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[8dvw] xl:px-[15dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
         <router-view :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
         <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
@@ -110,10 +111,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './plugins/firebase'
-import { useAuthStore } from './store'
+import { useAuthStore, useDataStore } from './store'
 import { useRouter, useRoute } from 'vue-router'
 import { db } from './plugins/firebase'
 import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit } from 'firebase/firestore'
@@ -126,6 +127,7 @@ const router = useRouter()
 const route = useRoute()
 
 const authStore = useAuthStore()
+const dataStore = useDataStore()
 
 const currentUser = ref(null)
 
@@ -155,6 +157,7 @@ onAuthStateChanged(auth, (user) => {
     currentUser.value = user
     authStore.currentUser = user
     getUserDetails(user.uid)
+    getNotifications(user.uid)
   }
 })
 
@@ -192,6 +195,44 @@ const collaborated = ref([])
 const getCollabs = (data) => {
   collaborated.value = data
 }
+
+// get notifications
+const notifRef = collection(db, 'notifications')
+const notifications = ref([])
+const notViewNotifications = ref(0)
+
+const getNotifications = async (uid) => {
+  try {
+    onSnapshot(
+        query(
+          notifRef,
+          where('to', '==', uid)
+        ),
+        (snapshot) => {
+          notifications.value = []
+          dataStore.notifications = []
+          notViewNotifications.value = 0
+          snapshot.docs.forEach(doc => {
+            dataStore.notifications.push({
+              id: doc.id,
+              ...doc.data()
+            })
+            if(!doc.data().isView){
+              notViewNotifications.value++
+            }
+            notifications.value.push({
+              id: doc.id,
+              ...doc.data()
+            })
+          })
+        }
+    )
+
+  } catch (error) {
+    
+  }
+}
+
 
 const toggleDarkmode = () => {
   document.documentElement.classList.toggle('dark')

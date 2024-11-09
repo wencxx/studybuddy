@@ -45,7 +45,8 @@
                     <p v-if="quiz.quizTimer" class="text-sm">Clicking yes will start the {{ quiz.quizTimer }} minute(s) timer</p>
                 </div>
                 <div class="flex gap-x-5 lg:px-10 w-full">
-                    <router-link :to="{ name: 'quiz' }"  class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500 text-center">Later</router-link>
+                    <router-link v-if="!route.query.v" :to="{ name: 'quiz' }"  class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500 text-center">Later</router-link>
+                    <router-link v-else :to="{ name: 'notifications' }"  class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500 text-center">Later</router-link>
                     <button class="bg-blue-500 w-full lg:w-1/2 rounded text-white" @click="startQuiz">Yes</button>
                 </div>
             </div>

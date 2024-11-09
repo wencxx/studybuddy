@@ -296,7 +296,6 @@ onMounted(() => {
 onUnmounted(() => {
     if(unsubscribe){
         unsubscribe()
-        console.log('unsubscribe')
     }
 })
 

@@ -73,7 +73,7 @@ const login = async () => {
         // router.push('/home')
         router.push(redirect);
     } catch (error) {
-        if(error.code === 'auth/invalid-credential'){
+        if(error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email'){
             invalidCredentials.value = true
         }
         console.log(error)

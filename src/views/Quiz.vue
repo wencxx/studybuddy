@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col gap-y-10">
         <div>
-            <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewPost = true">Add Quiz</button>
+            <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Quiz</button>
         </div>
 
         <div v-if="quizzes.length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -64,7 +64,10 @@
                 <!-- body -->
                 <div v-if="props.collaborated.length" class="flex flex-col gap-y-2 overflow-auto">
                     <div v-for="user in props.collaborated" :key="user.userId" class="flex items-center gap-x-2">
-                        <img :src="user.photoURL" alt="profile pic" class="rounded-full w-10 aspect-square">
+                        <img v-if="user.photoURL" :src="user.photoURL" alt="profile pic" class="rounded-full w-10 aspect-square">
+                        <div v-else class="rounded-full w-10 aspect-square bg-gray-100 flex items-center justify-center">
+                            <Icon icon="mdi:user" class="text-3xl" />
+                        </div>
                         <h1 class="text-lg">{{ user.displayName }}</h1>
                         <button v-if="sharedTo.includes(user.userId)" class="text-blue-500 border border-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Shared</button>
                         <button v-else class="text-white bg-blue-500 rounded px-3 ml-auto" @click="shareToUser(user.userId)">Share</button>
@@ -121,7 +124,7 @@
         
 
         <!-- newquiz component -->
-        <newQuiz v-if="addNewPost" @closeModal="addNewPost = false" @click.self="addNewPost = false" @newQuizDetails="insertNewQuiz" />
+        <newQuiz v-if="addNewQuiz" @closeModal="addNewQuiz = false" @click.self="addNewQuiz = false" @newQuizDetails="insertNewQuiz" />
     </div>
 </template>
 
@@ -131,7 +134,7 @@ import { useAuthStore } from '../store'
 import { onMounted, ref, computed, watch, defineProps } from 'vue'
 import moment from 'moment'
 import { db } from '../plugins/firebase'
-import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp, deleteDoc } from 'firebase/firestore'
+import{ collection, doc, getDocs, query, where, and, addDoc, Timestamp, deleteDoc, arrayUnion, updateDoc } from 'firebase/firestore'
 
 const props = defineProps({
     collaborated: Array
@@ -221,17 +224,26 @@ const shareQuiz = (quizId) => {
     showShareModal.value = true
 }
 
-const messageRef = collection(db, 'messages')
+// notifications reference
+const notifRef = collection(db, 'notifications')
 
 const shareToUser = async (userId) => {
+    const quizDOc = doc(db, 'quizzes', quizToShare.value)
+
     try {
-        const snapshot = await addDoc(messageRef, {
-            message: `${window.location.origin}/take-quiz/${quizToShare.value}`,
-            receiveBy: userId,
-            sendBy: currentUser.value.uid,
-            isRead: false,
-            messageAt: Timestamp.now(),
-            type: 'Share'
+        await updateDoc(quizDOc, {
+           sharedTo: arrayUnion(userId)
+        })
+
+        await addDoc(notifRef, {
+            to: userId,
+            from: currentUser.value.uid,
+            name: currentUser.value.displayName,
+            photoURL: currentUser.value.photoURL,
+            link: `/take-quiz/${quizToShare.value}`,
+            notifiedAt: Timestamp.now(),
+            isView: false,
+            isRead: false
         })
 
         sharedTo.value.push(userId)
@@ -302,7 +314,7 @@ onMounted(() => {
     })
 })
 
-const addNewPost = ref(false)
+const addNewQuiz = ref(false)
 </script>
 
 <style scoped>
