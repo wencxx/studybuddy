@@ -34,12 +34,12 @@
                           <p class="text-[.6rem] text-center">Share</p>
                         </div>
                     </div>
-                    <div class="group relative" @click="deleteNote(note.id, index)">
+                    <!-- <div class="group relative" @click="deleteNote(note.id, index)">
                         <Icon icon="mdi:trash-outline" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Delete</p>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="group relative">
                         <router-link :to="{ name: 'noteDetails', params: { id: note.id } }">
                             <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-lg cursor-pointer" />
@@ -51,7 +51,7 @@
                 </div>
             </div>
         </div>
-        <p v-else class="text-center">No notes to show</p>
+        <p v-else class="text-center">No shared notes to show</p>
 
         <!-- share to -->
         <div v-if="showShareModal" class="absolute top-0 left-0 w-screen h-screen bg-black/10 z-30 flex items-center justify-center">
@@ -120,7 +120,7 @@ const getNotes = () => {
     if(props.userId){
         const notesQuery = query(
             collection(db, 'notes'),
-            where('userId', '==', currentUser.value.uid),
+            where('sharedTo', 'array-contains', currentUser.value.uid),
             orderBy('addedAt', 'desc')
         );
 

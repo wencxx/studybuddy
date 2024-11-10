@@ -6,19 +6,27 @@
             <div v-for="notification in notifications" :key="notification.id" @click="redirectToLink(notification.link, notification.id)" >
                 <div v-if="checkDateIfToday(notification.notifiedAt)" class="bg-gray-100 dark:bg-neutral-700 p-2 px-3 rounded-xl flex items-center gap-x-2 cursor-pointer" :class="{ '!bg-gray-200 dark:!bg-neutral-600': !notification.isRead }" >
                     <div class="w-11 aspect-square rounded-full overflow-hidden">
-                        <img v-if="!notification.photoURL" :src="notification.photoURL" alt="profile picture" class="w-full aspect-square">
+                        <img v-if="notification.photoURL !== null" :src="notification.photoURL" alt="profile picture" class="w-full aspect-square">
                         <div class="w-full aspect-square bg-white dark:bg-gray-100/55 flex items-center justify-center">
                             <Icon icon="mdi:user" class="text-3xl text-black" />
                         </div>
                     </div>
                     <div>
                         <h1>{{ notification.name }}</h1>
-                        <p class="text-xs -mt-1 text-gray-500 dark:text-gray-100/55">{{ formatDate(notification.notifiedAt) }}</p>
+                        <p class="text-sm -mt-1 text-gray-500 dark:text-gray-100/55">
+                            <span v-if="notification.type === 'quiz'">Shared a quiz</span>
+                            <span v-if="notification.type === 'notes'">Shared a note</span>
+                            <span v-if="notification.type === 'request collab'">Requested a collaboration</span>
+                            <span v-if="notification.type === 'accepted collab'">Accepted your request</span>
+                        </p>
                     </div>
-                    <h1 class="ml-auto text-xs uppercase bg-blue-500 px-3 py-1 rounded" :class="{ 'bg-gray-500': notification.isRead }">{{ notification.isRead ? 'Checked' : 'Unchecked'  }}</h1>
+                    <div class="ml-auto space-y-1">
+                        <p class="text-xs text-gray-500 dark:text-gray-100/55">{{ formatDate(notification.notifiedAt) }}</p>
+                        <h1 class="text-xs text-center text-white w-fit ml-auto uppercase bg-blue-500 px-3 py-1 rounded" :class="{ 'bg-gray-500': notification.isRead }">{{ notification.isRead ? 'Checked' : 'Unchecked'  }}</h1>
+                    </div>
                 </div>
             </div>
-            <h1>Earlier</h1>
+            <h1 class="!mt-10">Earlier</h1>
             <div v-for="notification in notifications" :key="notification.id" @click="redirectToLink(notification.link, notification.id)" >
                 <div v-if="!checkDateIfToday(notification.notifiedAt)" class="bg-gray-100 dark:bg-neutral-700 p-2 px-3 rounded-xl flex items-center gap-x-2 cursor-pointer" :class="{ '!bg-gray-200 dark:!bg-neutral-600': !notification.isRead }" >
                     <div class="w-11 aspect-square rounded-full overflow-hidden">
@@ -29,9 +37,17 @@
                     </div>
                     <div>
                         <h1>{{ notification.name }}</h1>
-                        <p class="text-xs -mt-1 text-gray-500 dark:text-gray-100/55">{{ formatDate(notification.notifiedAt) }}</p>
+                        <p class="text-sm -mt-1 text-gray-500 dark:text-gray-100/55">
+                            <span v-if="notification.type === 'quiz'">Shared a quiz</span>
+                            <span v-if="notification.type === 'notes'">Shared a note</span>
+                            <span v-if="notification.type === 'request collab'">Requested a collaboration</span>
+                            <span v-if="notification.type === 'accepted collab'">Requested a collaboration</span>
+                        </p>
                     </div>
-                    <h1 class="ml-auto text-xs uppercase bg-blue-500 px-3 py-1 rounded" :class="{ 'bg-gray-500': notification.isRead }">{{ notification.isRead ? 'Checked' : 'Unchecked'  }}</h1>
+                    <div class="ml-auto space-y-1">
+                        <p class="text-xs text-gray-500 dark:text-gray-100/55">{{ formatDate(notification.notifiedAt) }}</p>
+                        <h1 class="text-xs text-center w-fit text-white ml-auto uppercase bg-blue-500 px-3 py-1 rounded" :class="{ 'bg-gray-500': notification.isRead }">{{ notification.isRead ? 'Checked' : 'Unchecked'  }}</h1>
+                    </div>
                 </div>
             </div>
         </div>

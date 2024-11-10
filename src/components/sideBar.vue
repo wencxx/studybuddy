@@ -10,18 +10,18 @@
                 </li>
                 <li>
                     <router-link :to="{ name: 'requests' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
-                        <Icon icon="mingcute:home-3-fill" class="text-2xl" />
+                        <Icon icon="carbon:collaborate" class="text-2xl" />
                         <span class="text-xl">Request</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedQuiz' }">
                         <Icon icon="mingcute:task-2-fill" class="text-2xl" />
                         <span class="text-xl">Quiz</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'notes' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <router-link  :to="{ name: 'notes' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedNotes' }">
                         <Icon icon="material-symbols:event-note" class="text-2xl" />
                         <span class="text-xl">Notes</span>
                     </router-link>

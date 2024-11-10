@@ -8,8 +8,7 @@
           </router-link>
         </div>
         <!-- nav -->
-        <div class="flex lg:hidden items-center">
-          <Icon :icon="iconType" class="text-3xl text-gray-900 dark:text-white cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
+        <div class="flex lg:hidden items-center"> 
           <nav class="h-[93dvh] w-0 overflow-hidden bg-gray-900 absolute border-r border-gray-100/10 left-0 top-[7dvh] flex flex-col gap-y-2 duration-150" :class="{ '!p-4 !w-2/3': showSidebar }">
             <ul class="hidden flex-col gap-y-2" :class="{ '!flex': showSidebar }">
                 <li>
@@ -18,10 +17,16 @@
                         <span class="text-xl">Home</span>
                     </router-link>
                 </li>
+                 <li>
+                    <router-link :to="{ name: 'requests' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="carbon:collaborate" class="text-3xl" />
+                        <span class="text-xl">Request</span>
+                    </router-link>
+                </li>
                 <li>
-                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedQuiz' }">
                         <Icon icon="mingcute:task-2-fill" class="text-3xl" />
-                        <span class="text-xl">Tasks</span>
+                        <span class="text-xl">Quiz</span>
                     </router-link>
                 </li>
                 <li>
@@ -31,10 +36,23 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <div @click="toggledMarketplace = !toggledMarketplace" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="ion:storefront" class="text-3xl" />
                         <span class="text-xl">Marketplace</span>
-                    </router-link>
+                        <Icon icon="weui:arrow-outlined" class="text-2xl ml-auto duration-150" :class="{ 'rotate-90': toggledMarketplace }" />
+                    </div>
+                    <div v-if="toggledMarketplace" class="flex flex-col gap-y-1 pl-10 mt-3">
+                        <router-link :to="{ name: 'selling' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Sell a product</span>
+                        </router-link>
+                        <router-link :to="{ name: 'listings' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Listings</span>
+                        </router-link>
+                        <!-- <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                            <Icon icon="ion:storefront" class="text-2xl" />
+                            <span class="text-xl">Marketplace</span>
+                        </router-link> -->
+                    </div>
                 </li>
                 <button @click="signout" class="bg-blue-500 rounded mt-6 py-1 hover:bg-blue-500/95">Sign out</button>
             </ul>
@@ -47,11 +65,24 @@
             </div>
           </button>
           <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+            <router-link :to="{ name: 'messages' }" class="relative">
+              <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+              <span v-if="notViewMessages > 0" class="absolute -top-1 -right-1 text-[0.6rem] bg-red-500 py-[0.05rem] px-[0.4rem] rounded-full text-white">{{ notViewMessages }}</span>
+            </router-link>
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem]">Messages</p>
             </div>
           </button>
+          <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <router-link :to="{ name: 'notifications' }" class="relative">
+              <Icon icon="ion:notifications" class="text-2xl text-gray-400 dark:text-gray-300" />
+              <span v-if="notViewNotifications > 0" class="absolute -top-1 -right-1 text-[0.6rem] bg-red-500 py-[0.05rem] px-[0.4rem] rounded-full text-white">{{ notViewNotifications }}</span>
+            </router-link>
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+              <p class="text-[.6rem]">Notifications</p>
+            </div>
+          </button>
+          <Icon :icon="iconType" class="text-3xl text-gray-900 dark:text-white cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
         </div>
         <!-- profile -->
         <div class="hidden lg:flex items-center gap-x-2">
@@ -67,8 +98,9 @@
             </div>
           </button>
           <button v-if="authStore.isAuthenticated" class="hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
-            <router-link :to="{ name: 'messages' }">
+            <router-link :to="{ name: 'messages' }" class="relative">
               <Icon icon="mage:message-dots-fill" class="text-2xl text-gray-400 dark:text-gray-300" />
+              <span v-if="notViewMessages > 0" class="absolute -top-1 -right-1 text-[0.6rem] bg-red-500 py-[0.05rem] px-[0.4rem] rounded-full text-white">{{ notViewMessages }}</span>
             </router-link>
             <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
               <p class="text-[.6rem]">Messages</p>
@@ -117,11 +149,14 @@ import { auth } from './plugins/firebase'
 import { useAuthStore, useDataStore } from './store'
 import { useRouter, useRoute } from 'vue-router'
 import { db } from './plugins/firebase'
-import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit } from 'firebase/firestore'
+import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit, orderBy } from 'firebase/firestore'
 
 // components import
 import sideBar from './components/sideBar.vue'
 import rightSideBar from './components/collaboratedSideBar.vue'
+
+
+const toggledMarketplace = ref(false)
 
 const router = useRouter()
 const route = useRoute()
@@ -158,6 +193,7 @@ onAuthStateChanged(auth, (user) => {
     authStore.currentUser = user
     getUserDetails(user.uid)
     getNotifications(user.uid)
+    getMessages(user.uid)
   }
 })
 
@@ -206,7 +242,8 @@ const getNotifications = async (uid) => {
     onSnapshot(
         query(
           notifRef,
-          where('to', '==', uid)
+          where('to', '==', uid),
+          orderBy('notifiedAt', 'desc')
         ),
         (snapshot) => {
           notifications.value = []
@@ -232,6 +269,41 @@ const getNotifications = async (uid) => {
     
   }
 }
+
+// get messages
+const messageRef = collection(db, 'messages')
+const messages = ref([])
+const notViewMessages = ref(0)
+
+const getMessages = async (uid) => {
+  try {
+    onSnapshot(
+      query(
+        messageRef,
+        where('receiveBy', '==', uid)
+      ),
+      (snapshot) => {
+        messages.value = []
+        notViewMessages.value = 0
+
+        const countedSenders = new Set()
+
+        snapshot.docs.forEach(doc => {
+          const messageData = { id: doc.id, ...doc.data() }
+          messages.value.push(messageData)
+
+          if (!messageData.isView && !countedSenders.has(messageData.sendBy)) {
+            notViewMessages.value++
+            countedSenders.add(messageData.sendBy)
+          }
+        })
+      }
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 
 
 const toggleDarkmode = () => {

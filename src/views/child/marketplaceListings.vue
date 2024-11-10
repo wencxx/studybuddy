@@ -1,23 +1,23 @@
 <template>
-    <div class="flex flex-col gap-y-5">
+    <div class="flex flex-col gap-y-5 overflow-auto content min-h-[90dvh]">
         <p>Listings</p>
         <div v-if="listings.length" class="grid lg:grid-cols-2 gap-5">
             <div v-for="list in listings" :key="list.id" class="bg-neutral-700/10 p-2 rounded">
-                <img :src="list.imagesUrl[0]" alt="product image" class="rounded-md aspect-video object-cover">
+                <img :src="list.imagesUrl[0]" alt="product image" class="rounded-md w-full aspect-video object-cover">
                 <h1 class="font-bold text-lg">Php {{ list.productPrice }}</h1>
                 <h2 class="text-md">{{ list.productName }}</h2>
                 <p class="text-sm line-clamp-1">{{ list.productDescription }}</p>
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <div v-if="list.userId !== currentUser.uid" class="group relative" @click="shareNote(note.id)">
+                    <router-link :to="{ name: 'marketplaceMessage', params: { id: list.userId }, query: { item: list.id } }" v-if="list.userId !== currentUser.uid" class="group relative" @click="shareNote(note.id)">
                         <Icon icon="mage:message" class="text-blue-500/70 text-xl cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Inquire</p>
                         </div>
-                    </div>
+                    </router-link>
                     <div class="group relative">
-                        <router-link>
+                        <div>
                             <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-2xl cursor-pointer" />
-                        </router-link>
+                        </div>
                         <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">View details</p>
                         </div>
@@ -66,3 +66,9 @@ onMounted(() => {
     getListings()
 })
 </script>
+
+<style scoped>
+.content::-webkit-scrollbar {
+    display: none;
+}
+</style>

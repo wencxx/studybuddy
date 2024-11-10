@@ -33,7 +33,7 @@
                     <input type="number" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2" v-model="productData.productQuantity">
                 </div>
                 <div class="flex flex-col gap-y-2">
-                    <label>Product Image (Atleast one image)</label>
+                    <label>Product Image <span class="text-xs">(Atleast one image)</span></label>
                     <div @click="toggleImageInput" :class="{ '!cursor-not-allowed': tempUrl.length === 3 }" class="w-2/4 h-8 rounded border border-gray-300 dark:border-gray-100/10 dark:bg-transparent focus:outline-none pl-2 flex items-center justify-center gap-x-2 cursor-pointer">
                         <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-2xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" />
                         <p class="text-sm">Choose product image</p>

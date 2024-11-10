@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-col overflow-hidden">
         <div v-if="user" class="flex items-center gap-x-5 mb-2">
-            <img v-if="user?.photoURL" :src="user?.photoURL" alt="profilepic" class="rounded-full h-14 aspect-square">
-            <div v-else class="border rounded-full h-14 aspect-square flex items-center justify-center">
-                <Icon icon="mdi:user" class="text-4xl" />
+            <img v-if="user?.photoURL" :src="user?.photoURL" alt="profilepic" class="rounded-full h-16 aspect-square">
+            <div v-else class="border rounded-full h-16 aspect-square flex items-center justify-center">
+                <Icon icon="mdi:user" class="text-3xl" />
             </div>
             <router-link :to="{ name: 'userDetails', param: { id: $route.params.id } }">
                 <h1 class="text-xl">{{ user?.displayName }}</h1>
@@ -94,7 +94,7 @@ const sendMessage = async (receiverID) => {
         messageAt: Timestamp.now(),
         isRead: false,
         isView: false,
-        type: 'personal'
+        type: 'market'
       });
       message.value = ''
     } catch (error) {
@@ -111,7 +111,7 @@ const getMessages = () => {
             collection(db, 'messages'),
             where('receiveBy', '==', route.params.id),
             where('sendBy', '==', currentUser.value?.uid),
-            where('type', '==', 'personal'),
+            where('type', '==', 'market'),
             orderBy('messageAt', 'desc')
         );
 
@@ -119,7 +119,7 @@ const getMessages = () => {
             collection(db, 'messages'),
             where('receiveBy', '==', currentUser.value?.uid),
             where('sendBy', '==', route.params.id),
-            where('type', '==', 'personal'),
+            where('type', '==', 'market'),
             orderBy('messageAt', 'desc')
         );  
 
@@ -155,6 +155,10 @@ const getMessages = () => {
         });
     }
 };
+
+
+
+
 
 onMounted(() => {
     getUser()

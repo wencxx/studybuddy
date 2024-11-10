@@ -1,8 +1,8 @@
 <template>
     <div>
         <h1 class="text-lg">Collab Requests</h1>
-        <div v-if="users.length > 0" class="grid grid-cols-3 gap-4 mt-5">
-            <div v-for="(user, index) in users" :key="user.id" class="rounded-md overflow-hidden bg-gray-100 dark:bg-neutral-700">
+        <div v-if="users.length > 0" class="flex flex-col gap-y-2 mt-5">
+            <!-- <div v-for="(user, index) in users" :key="user.id" class="rounded-md overflow-hidden bg-gray-100 dark:bg-neutral-700">
                 <router-link :to="{ name: 'userDetails', params: { id: user.userId } }">
                     <img v-if="user.photoURL" :src="user.photoURL" alt="profile pic" class="w-full aspect-square">
                     <div v-else class="w-full aspect-square flex items-center justify-center bg-gray-200 dark:bg-gray-100/10">
@@ -16,6 +16,26 @@
                     <button class="rounded bg-blue-500 py-1 text-white text-sm" @click="toggleRequest('accept', user.userId, index)">Accept</button>
                     <button class="rounded border border-blue-500 py-1 text-blue-500 text-sm" @click="toggleRequest('decline', user.userId)">Decline</button>
                 </div>
+            </div> -->
+            <div v-for="(user, index) in users" :key="user.id" class="rounded-md overflow-hidden bg-gray-100 dark:bg-neutral-700 flex justify-between p-3">
+                <router-link :to="{ name: 'userDetails', params: { id: user.userId } }" class="flex items-center">
+                    <img v-if="user.photoURL" :src="user.photoURL" alt="profile pic" class="w-10 rounded-full aspect-square">
+                    <div v-else class="w-10 rounded-full aspect-square flex items-center justify-center bg-gray-200 dark:bg-gray-100/10">
+                        <Icon icon="mdi:user" class="dark:text-white text-2xl" />
+                    </div>
+                    <div class="p-1 px-2">
+                        <h1 class="hover:underline">{{ user.displayName }}</h1>
+                        <h1 class="text-xs -mt-1">@{{ user.studentNumber }}</h1>
+                    </div>
+                </router-link>
+                <div class="flex items-center p-1 px-2 gap-x-2">
+                    <button class="rounded-full bg-gray-300 text-black dark:bg-neutral-500 w-fit h-fit p-2 dark:text-white" @click="toggleRequest('decline', user.userId, index)">
+                        <Icon icon="mdi:close" class="text-sm" />
+                    </button>
+                    <button class="rounded-full bg-blue-500 w-fit h-fit p-2 text-white" @click="toggleRequest('accept', user.userId, index)">
+                        <Icon icon="mdi:check" class="text-sm" />
+                    </button>
+                </div>
             </div>
         </div>
         <div v-else class="mt-5">
@@ -25,9 +45,13 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watch, ref } from 'vue'
+import { defineProps, onMounted, watch, ref, computed } from 'vue'
 import { db } from '../plugins/firebase'
-import { collection, getDocs, where, limit, query, doc, arrayRemove, arrayUnion, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, where, limit, query, doc, arrayRemove, arrayUnion, updateDoc, addDoc, Timestamp } from 'firebase/firestore'
+import { useAuthStore } from '../store'
+
+const authStore = useAuthStore()
+const currentUser = computed(() => authStore.currentUser)
 
 const props = defineProps({
     userId: String
@@ -89,6 +113,9 @@ const getUsers = async () => {
     }
 }
 
+// toggle collab request
+const notifRef = collection(db, 'notifications')
+
 const toggleRequest = async (type, id, index) => {
     if(type === 'accept'){
         try {
@@ -145,6 +172,19 @@ const toggleRequest = async (type, id, index) => {
                     collabs: arrayUnion(id)
                 }); 
             });
+
+            // notify the sender
+            await addDoc(notifRef, {
+                to: id,
+                from: currentUser.value?.uid,
+                name: currentUser.value?.displayName,
+                photoURL: currentUser.value?.photoURL,
+                link: `/user-details/${currentUser.value?.uid}`,
+                notifiedAt: Timestamp.now(),
+                isView: false,
+                isRead: false,
+                type: 'accepted collab'
+            })
         }catch(error) {
             console.error(error)
         }

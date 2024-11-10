@@ -46,6 +46,14 @@ const routes = [
         }
     },
     {
+        path: '/shared-quiz',
+        name: 'sharedQuiz',
+        component: () => import('../views/SharedQuiz.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/take-quiz/:id',
         name: 'takeQuiz',
         component: () => import('../views/TakeQuiz.vue')
@@ -54,6 +62,14 @@ const routes = [
         path: '/notes',
         name: 'notes',
         component: () => import('../views/Notes.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/shared-notes',
+        name: 'sharedNotes',
+        component: () => import('../views/SharedNotes.vue'),
         meta: {
             requiresAuth: true
         }
@@ -82,6 +98,22 @@ const routes = [
                 component: () => import('../views/child/marketplaceListings.vue')
             }
         ]
+    },
+    {
+        path: '/marketplace-message/:id',
+        name: "marketplaceMessage",
+        component: () => import('../views/MarketplaceMessage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/marketplace-messages',
+        name: "marketplaceMessages",
+        component: () => import('../views/MarketplaceMessages.vue'),
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: '/user-details/:id',

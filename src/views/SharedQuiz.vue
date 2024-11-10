@@ -15,12 +15,13 @@
                     <div class="border border-blue-500 w-10 aspect-square rounded-lg flex items-center justify-center">
                         <Icon icon="fluent-mdl2:task-list" class="text-blue-500 text-2xl" />
                     </div>
-                    <div class="relative">
+                    <!-- delete button -->
+                    <!-- <div class="relative">
                         <Icon @click="showDeleteModal(index)" icon="mdi:dots-horizontal" class="text-gray-500 text-2xl dark:text-white ml-auto cursor-pointer" />
                         <div v-if="deleteModal === index" class="absolute top-[110%] right-0 bg-neutral-500 p-1 rounded">
                             <button class="text-sm" @click="deleteQuiz(quiz.id, index)">delete</button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <!-- quiz body -->
                 <div class="flex flex-col gap-y-2">
@@ -36,12 +37,13 @@
                           <p class="text-[.6rem] text-center">View Answered</p>
                         </div>
                     </div>
-                    <div class="group relative" @click="shareQuiz(quiz.id)">
+                    <!-- share to button -->
+                    <!-- <div class="group relative" @click="shareQuiz(quiz.id)">
                         <Icon icon="mdi-light:share" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Share</p>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="group relative">
                         <router-link :to="{ name: 'takeQuiz', params: { id: quiz.id } }">
                             <Icon icon="codicon:debug-start" class="text-blue-500/70 text-lg cursor-pointer" />
@@ -54,7 +56,7 @@
             </div>
         </div>
         <div v-else>
-            <p class="text-center -ml-5">No quiz to show</p>
+            <p class="text-center -ml-5">No shared quiz to show</p>
         </div>
 
         <!-- share to -->
@@ -193,7 +195,7 @@ const getQuizzes = async () => {
         quizRef,
         and(
             where('status', '==', 'to do'),
-            where('userId', '==', currentUser.value.uid),
+            where('sharedTo', 'array-contains', currentUser.value.uid),
         )
     )
     try {

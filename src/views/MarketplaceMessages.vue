@@ -13,7 +13,7 @@
 
         <div v-if="groupedMessages && Object.keys(groupedMessages).length" class="flex flex-col gap-y-5">
             <div v-for="(group, person) in groupedMessages" :key="person" class="bg-gray-100 dark:bg-neutral-700 p-2 px-3 rounded-xl" :class="{ '!bg-gray-200 dark:!bg-neutral-600': !group[0].isRead }">
-                <router-link :to="{ name: 'message', params: { id: person } }" class="flex items-center gap-x-4 cursor-pointer">
+                <router-link :to="{ name: 'marketplaceMessage', params: { id: person } }" class="flex items-center gap-x-4 cursor-pointer">
                     <div class="w-14 aspect-square !rounded-full">
                         <img v-if="group[0].photoURL" :src="group[0].photoURL" alt="profile pic" class="w-full h-full rounded-full">
                         <Icon v-else icon="mdi:user" class="border p-2 w-full h-full rounded-full" />
@@ -108,8 +108,8 @@ const getMessages = () => {
         query(
             messRef,
             or(
-                and(where('receiveBy', '==', props.userId), where('type', '==', 'personal')),
-                and(where('sendBy', '==', props.userId), where('type', '==', 'personal'))
+                and(where('receiveBy', '==', props.userId), where('type', '==', 'market')),
+                and(where('sendBy', '==', props.userId), where('type', '==', 'market'))
             ),
         ),
         (snapshot) => {
@@ -158,7 +158,7 @@ const viewAllMessages = async () => {
             messagesRef,
             and(
                 where('receiveBy', '==', currentUser.value.uid),
-                where('type', '==', 'personal')
+                where('type', '==', 'market')
             )
         )
 

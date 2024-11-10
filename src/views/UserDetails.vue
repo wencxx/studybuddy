@@ -44,15 +44,15 @@
                 </button>
             </div>
             <button v-if="isCollaborated(user?.userId) === 'accept'" class="w-1/2 border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
-                <Icon icon="tdesign:user-error-1" class="text-xl" />
+                <!-- <Icon icon="tdesign:user-error-1" class="text-xl" /> -->
                 <span>Decline</span>
             </button>
             <button v-if="isCollaborated(user?.userId) === 'requested'" class="w-1/2 border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2" @click="toggleCollab('cancel', user?.userId)">
-                <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
+                <!-- <Icon icon="tdesign:user-error-1" class="text-xl" /> -->
                 <span>cancel</span>
             </button>
             <router-link :to="{ name: 'message', params: { id: user?.userId } }" v-if="isCollaborated(user?.userId) === 'collaborated'" class="w-1/2 border border-gray-300 dark:border-gray-100/10 hover:dark:bg-gray-700/25 py-1 rounded flex justify-center items-center gap-x-2">
-                <Icon icon="bitcoin-icons:message-outline" class="text-3xl" />
+                <!-- <Icon icon="bitcoin-icons:message-outline" class="text-3xl" /> -->
                 <span>Message</span>
             </router-link>
         </div>
@@ -183,7 +183,7 @@ import comments from '../components/comments.vue'
 import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
-import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp } from 'firebase/firestore';
 import { db, storage, auth } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
@@ -269,11 +269,6 @@ const getUserPosts = async () => {
         posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     }
   )
-
-//   const querySnapshot = await getDocs(q);
-//   querySnapshot.forEach((doc) => {
-//     posts.value.push({ id: doc.id, ...doc.data() })
-//   });
 };
 
 // edit post
@@ -295,6 +290,8 @@ const formatDate = (firestoreTimestamp) => {
 
 
 // toggle collaboration button
+const notifRef = collection(db, 'notifications')
+
 const toggleCollab = async (type, id) => {
     if(type === 'request'){
         try {
@@ -320,7 +317,18 @@ const toggleCollab = async (type, id) => {
                 }); 
             });
 
-
+            // notify the receiver
+            await addDoc(notifRef, {
+                to: id,
+                from: currentUser.value?.uid,
+                name: currentUser.value?.displayName,
+                photoURL: currentUser.value?.photoURL,
+                link: '/requests',
+                notifiedAt: Timestamp.now(),
+                isView: false,
+                isRead: false,
+                type: 'request collab'
+            })
         } catch (error) {
             console.error("Error updating documents: ", error);
         }
@@ -379,6 +387,19 @@ const toggleCollab = async (type, id) => {
                     collabs: arrayUnion(id)
                 }); 
             });
+
+            // notify the sender
+            await addDoc(notifRef, {
+                to: id,
+                from: currentUser.value?.uid,
+                name: currentUser.value?.displayName,
+                photoURL: currentUser.value?.photoURL,
+                link: `/user-details/${currentUser.value?.uid}`,
+                notifiedAt: Timestamp.now(),
+                isView: false,
+                isRead: false,
+                type: 'accepted collab'
+            })
         }catch(error) {
             console.error(error)
         }
