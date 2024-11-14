@@ -85,6 +85,11 @@ const routes = [
         component: () => import('../views/Calendar.vue')
     },
     {
+        path: '/rate',
+        name: 'rate',
+        component: () => import('../views/Rate.vue')
+    },
+    {
         path: '/marketplace',
         name: 'marketplace',
         component: () => import('../views/MarketPlace.vue'),

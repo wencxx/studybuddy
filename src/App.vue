@@ -175,6 +175,7 @@ watch(() => route.path, (newPath) => {
   if(newPath){
     showSidebar.value = false
     iconType.value = 'eva:menu-fill'
+    searchQuery.value = ''
   }
 })
 
