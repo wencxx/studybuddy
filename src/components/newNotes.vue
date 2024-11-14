@@ -10,6 +10,16 @@
       <div>
         <p class="mb-1">Title</p>
         <input type="text" class="w-full rounded h-9 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2 mb-2" v-model="noteTitle">
+        <p class="mb-1">Category</p>
+        <select class="w-full rounded h-9 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2 mb-2" v-model="noteCategory">
+          <option value="">Select Category</option>
+          <option class="dark:text-black">Programming</option>
+          <option class="dark:text-black">Science</option>
+          <option class="dark:text-black">Math</option>
+          <option class="dark:text-black">English</option>
+          <option class="dark:text-black">Engineering</option>
+          <option class="dark:text-black">Food trade</option>
+        </select>
         <p class="mb-1">Details</p>
         <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="noteDetails"></textarea>
         <!-- media list -->
@@ -52,7 +62,6 @@ const currentUser = computed(() => authStore.currentUser)
 
 const emit = defineEmits(['closeModal'])
 
-
 // close modal
 const closeModal = () => {
   emit('closeModal')
@@ -84,6 +93,7 @@ const removeImageToPost = (img) => {
 
 const noteTitle = ref('')
 const noteDetails = ref('')
+const noteCategory = ref('')
 const adding = ref(false)
 
 const post = async () => {
@@ -103,6 +113,7 @@ const post = async () => {
 
       await addDoc(collection(db, 'notes'), {
         title: noteTitle.value,
+        category: noteCategory.value,
         details: noteDetails.value,
         addedAt: Timestamp.now(),
         userId: currentUser.value.uid,

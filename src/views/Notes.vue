@@ -7,7 +7,18 @@
             <router-link :to="{ name: 'notes' }" :class="{ 'bg-[#2563eb]': $route.name === 'notes' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Notes</router-link>
             <router-link :to="{ name: 'sharedNotes' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedNotes' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Notes</router-link>
         </div>
-
+        <!-- filter -->
+        <div>
+            <select class="w-fit float-right rounded h-9 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2 mb-2" v-model="filterCategory">
+                <option value="">All</option>
+                <option class="dark:text-black">Programming</option>
+                <option class="dark:text-black">Science</option>
+                <option class="dark:text-black">Math</option>
+                <option class="dark:text-black">English</option>
+                <option class="dark:text-black">Engineering</option>
+                <option class="dark:text-black">Food trade</option>
+            </select>
+        </div>
         <!-- notes -->
         <div v-if="notes.length > 0" class="grid md:grid-cols-2 gap-5">
             <div v-for="(note, index) in notes" :key="index" class="h-full border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col justify-between gap-y-3">
@@ -24,6 +35,7 @@
                 <div class="flex flex-col gap-y-2">
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
                     <p class="line-clamp-3 text-sm">{{ note.details }}</p>
+                    <p class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
                     <p v-if="note.notesImages.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages.length }} attachments</p>
                 </div>
                 <!-- note footer -->
@@ -102,6 +114,8 @@ const props = defineProps({
     userId: String,
     collaborated: Array
 })
+
+const filterCategory = ref('')
 
 onMounted(() => {
     if (currentUser.value && currentUser.value.uid) {
