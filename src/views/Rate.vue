@@ -4,7 +4,7 @@
         <div class="space-y-10">
             <!-- Question 1 -->
             <div class="flex flex-col gap-y-2">
-                <label>1. Jane Marie Balasabas How often do you use StudyBuddy? (Daily, Weekly, Monthly, Rarely)</label>
+                <label>1. How often do you use StudyBuddy? (Daily, Weekly, Monthly, Rarely)</label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -71,15 +71,30 @@
                     />
                 </div>
             </div>
+
+            <div>
+                <button v-if="!submitting" class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Submit</button>
+                <button v-else class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Submit</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { ref, computed} from 'vue';
+import { useAuthStore } from '../store'
+import { db } from '../plugins/firebase'
+import { collection, addDoc } from 'firebase/firestore'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css' 
+
+const $toast = useToast()
+
+const authStore = useAuthStore()
+const currentUser = computed(() => authStore.currentUser)
 
 // Reactive object to store ratings for each question
-const ratings = reactive({
+const ratings = ref({
     q1: 0,
     q2: 0,
     q3: 0,
@@ -89,8 +104,37 @@ const ratings = reactive({
 
 // Function to handle rating selection
 const rate = (question, rating) => {
-    ratings[question] = rating;
+    ratings.value[question] = rating;
 };
+
+// submit rating
+const submitting = ref(false)
+const ratingsRef = collection(db, 'ratings')
+
+const submitRating = async () => {
+    try {
+        submitting.value = true
+        const snapshot = await addDoc(ratingsRef, {
+            ...ratings.value,
+            userId: currentUser.value?.uid
+        })
+
+        if(!snapshot.empty){
+            $toast.success('Submitted rating sucessfully')
+            ratings.value = {
+                q1: 0,
+                    q2: 0,
+                    q3: 0,
+                    q4: 0,
+                    q5: 0,
+                }
+        } 
+    } catch (error) {
+        console.log(error)
+    }finally{
+        submitting.value = false
+    }
+}
 </script>
 
 <style scoped>
@@ -98,5 +142,8 @@ const rate = (question, rating) => {
 .icon:hover {
     transform: scale(1.1);
     transition: transform 0.2s ease-in-out;
+}
+.content::-webkit-scrollbar {
+    display: none;
 }
 </style>
