@@ -27,6 +27,12 @@
                     </router-link>
                 </li>
                 <li>
+                    <router-link  :to="{ name: 'calendar' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedNotes' }">
+                        <Icon icon="tabler:calendar" class="text-2xl"/>
+                        <span class="text-xl">Calendar</span>
+                    </router-link>
+                </li>
+                <li>
                     <div @click="toggledMarketplace = !toggledMarketplace" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="ion:storefront" class="text-2xl" />
                         <span class="text-xl">Marketplace</span>

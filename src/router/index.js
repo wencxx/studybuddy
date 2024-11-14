@@ -80,6 +80,11 @@ const routes = [
         component: () => import('../views/ViewNotes.vue')
     },
     {
+        path: '/calendar',
+        name: 'calendar',
+        component: () => import('../views/Calendar.vue')
+    },
+    {
         path: '/marketplace',
         name: 'marketplace',
         component: () => import('../views/MarketPlace.vue'),

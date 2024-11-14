@@ -52,6 +52,12 @@
                           <p class="text-[.6rem] text-center">Share</p>
                         </div>
                     </div>
+                    <div class="group relative" @click="editNote(note)">
+                        <Icon icon="mdi:pencil-outline" class="text-blue-500/70 text-lg cursor-pointer" />
+                        <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+                          <p class="text-[.6rem] text-center">Edit</p>
+                        </div>
+                    </div>
                     <div class="group relative" @click="deleteNote(note.id, index)">
                         <Icon icon="mdi:trash-outline" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
@@ -98,11 +104,13 @@
         </div>
 
         <newNotes v-if="addNewNote" @click.self="addNewNote = false" @closeModal="addNewNote = false" />
+        <editNoteComponent v-if="editNoteModal" :note="noteToEdit"  @closeModal="editNoteModal = false" />
     </div>
 </template>
 
 <script setup>
 import newNotes from '../components/newNotes.vue'
+import editNoteComponent from '../components/editNote.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { computed, onMounted, ref, defineProps, toRef, watch } from 'vue'
 import { onSnapshot, query, orderBy, where, collection, deleteDoc, doc, addDoc, Timestamp, updateDoc, arrayUnion } from 'firebase/firestore'
@@ -216,7 +224,7 @@ const shareToUser = async (userId) => {
     }
 }
 
-// delete doc
+// delete note
 const deleteNote = async (noteID, index) => {
     const docRef = doc(db, 'notes', noteID)
     try {
@@ -226,6 +234,16 @@ const deleteNote = async (noteID, index) => {
     } catch (error) {
         console.log(error)
     }
+}
+
+// edit note
+const editNoteModal = ref(false)
+const noteToEdit = ref(null)
+
+const editNote = (note) => {
+    noteToEdit.value = note
+
+    editNoteModal.value = true
 }
 </script>
 

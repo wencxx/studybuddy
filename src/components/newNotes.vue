@@ -143,6 +143,8 @@ const post = async () => {
 
       noteDetails.value = ''
       noteTitle.value = ''
+      noteCategory.value = ''
+      tags.value = []
     } catch (error) {
       console.error('Error adding note: ', error);
     }finally{
