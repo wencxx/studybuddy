@@ -20,8 +20,8 @@
             </select>
         </div>
         <!-- notes -->
-        <div v-if="notes.length > 0" class="grid md:grid-cols-2 gap-5">
-            <div v-for="(note, index) in notes" :key="index" class="h-full border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col justify-between gap-y-3">
+        <div v-if="filteredNotes().length > 0" class="grid md:grid-cols-2 gap-5">
+            <div v-for="(note, index) in filteredNotes()" :key="index" class="h-full border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col justify-between gap-y-3">
                 <!-- note header -->
                 <div class="flex items-center justify-between">
                     <div class="border border-blue-500 w-10 aspect-square rounded-lg flex items-center justify-center">
@@ -128,6 +128,12 @@ onMounted(() => {
         }
     })
 })
+
+const filteredNotes = () => {
+    if(!filterCategory.value) return notes.value
+
+    return notes.value.filter(note => note.category === filterCategory.value)
+}
 
 // get real time notes
 const getNotes = () => {
