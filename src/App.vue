@@ -87,7 +87,7 @@
         <!-- profile -->
         <div class="hidden lg:flex items-center gap-x-2">
           <div  v-if="authStore.isAuthenticated" class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
-            <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block">
+            <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block" v-model="searchQuery">
             <Icon icon="mynaui:search" class="text-gray-400 dark:text-white text-2xl" />
           </div>
           <button class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group" @click="toggleDarkmode">
@@ -136,7 +136,7 @@
       <!-- body -->
       <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[8dvw] xl:px-[15dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
-        <router-view :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
+        <router-view :searchQuery="searchQuery" :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
         <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
       </div>
   </div>
@@ -154,6 +154,8 @@ import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit, orde
 // components import
 import sideBar from './components/sideBar.vue'
 import rightSideBar from './components/collaboratedSideBar.vue'
+
+const searchQuery = ref('')
 
 
 const toggledMarketplace = ref(false)

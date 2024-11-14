@@ -20,6 +20,11 @@
           <option class="dark:text-black">Engineering</option>
           <option class="dark:text-black">Food trade</option>
         </select>
+        <p class="mb-1">Tags</p>
+        <input type="text" class="w-full rounded h-9 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2 mb-2" v-model="tag" @keyup.space="addTags">
+        <div class="flex flex-wrap gap-1">
+          <p v-for="(tag, index) in tags" :key="tag" class="dark:bg-gray-100/10 w-fit px-3 py-1 rounded-full cursor-pointer" @click="removeTag(index)">{{ tag }}</p>
+        </div>
         <p class="mb-1">Details</p>
         <textarea class="w-full rounded min-h-32 bg-transparent border border-gray-300 dark:border-gray-100/10 focus:outline-none p-2" v-model="noteDetails"></textarea>
         <!-- media list -->
@@ -91,9 +96,23 @@ const removeImageToPost = (img) => {
   }
 }
 
+// add tag
+const tag = ref('')
+
+const addTags = () => {
+  tags.value.push(tag.value)
+  tag.value = ''
+}
+
+// remove tag
+const removeTag = (index) => {
+  tags.value.splice(index, 1)
+}
+
 const noteTitle = ref('')
 const noteDetails = ref('')
 const noteCategory = ref('')
+const tags = ref([])
 const adding = ref(false)
 
 const post = async () => {
@@ -114,6 +133,7 @@ const post = async () => {
       await addDoc(collection(db, 'notes'), {
         title: noteTitle.value,
         category: noteCategory.value,
+        tags: tags.value,
         details: noteDetails.value,
         addedAt: Timestamp.now(),
         userId: currentUser.value.uid,

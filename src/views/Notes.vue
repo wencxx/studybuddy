@@ -4,8 +4,8 @@
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewNote = true">New note</button>
         </div>
         <div class="flex overflow-hidden">
-            <router-link :to="{ name: 'notes' }" :class="{ 'bg-[#2563eb]': $route.name === 'notes' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Notes</router-link>
-            <router-link :to="{ name: 'sharedNotes' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedNotes' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Notes</router-link>
+            <router-link :to="{ name: 'notes' }" :class="{ 'bg-[#2563eb]': $route.name === 'notes' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-3/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Notes</router-link>
+            <router-link :to="{ name: 'sharedNotes' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedNotes' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-3/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Notes</router-link>
         </div>
         <!-- filter -->
         <div>
@@ -34,8 +34,14 @@
                 <!-- note body -->
                 <div class="flex flex-col gap-y-2">
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
-                    <p class="line-clamp-3 text-sm">{{ note.details }}</p>
-                    <p class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
+                    <p class="line-clamp-3">{{ note.details }}</p>
+                    <p v-if="note.category.length" class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
+                    <p v-if="note.tags.length" class="line-clamp-3 text-xs dark:text-gray-300 capitalize">
+                        Tags: 
+                        <span v-for="(tag, index) in note.tags" :key="tag">
+                            {{ tag }}<span v-if="index < note.tags.length - 1">, </span>
+                        </span>
+                    </p>
                     <p v-if="note.notesImages.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages.length }} attachments</p>
                 </div>
                 <!-- note footer -->
@@ -112,7 +118,8 @@ const notes = ref([])
 
 const props = defineProps({
     userId: String,
-    collaborated: Array
+    collaborated: Array,
+    searchQuery: String
 })
 
 const filterCategory = ref('')
@@ -129,10 +136,21 @@ onMounted(() => {
     })
 })
 
+// filter notes
 const filteredNotes = () => {
-    if(!filterCategory.value) return notes.value
+    if(!filterCategory.value && !props.searchQuery) return notes.value
 
-    return notes.value.filter(note => note.category === filterCategory.value)
+    if(props.searchQuery && filterCategory.value) {
+        return notes.value.filter(note => 
+            note.tags?.some(tag => tag.toLowerCase().includes(props.searchQuery.toLowerCase())) &&
+            note.category?.toLowerCase().includes(filterCategory.value.toLowerCase())
+        );
+    }else if(props.searchQuery){
+        return notes.value.filter(note => note.tags?.some(tag => tag.toLowerCase().includes(props.searchQuery.toLowerCase())))
+    }else{
+        return notes.value.filter(note => note.category === filterCategory.value)
+    }
+    
 }
 
 // get real time notes
