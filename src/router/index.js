@@ -90,6 +90,11 @@ const routes = [
         component: () => import('../views/Rate.vue')
     },
     {
+        path: '/feedback',
+        name: 'feedback',
+        component: () => import('../views/Feedback.vue')
+    },
+    {
         path: '/marketplace',
         name: 'marketplace',
         component: () => import('../views/MarketPlace.vue'),

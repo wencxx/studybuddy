@@ -73,8 +73,8 @@
             </div>
 
             <div>
-                <button v-if="!submitting" class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Submit</button>
-                <button v-else class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Submit</button>
+                <button v-if="!submitting" class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Rate</button>
+                <button v-else class="float-right bg-blue-500 px-3 py-1 rounded" @click="submitRating">Rating</button>
             </div>
         </div>
     </div>
