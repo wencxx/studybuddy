@@ -208,7 +208,7 @@ const getUserDetails = (uid) => {
     );
 
     onSnapshot(notesQuery, (snapshot) => {
-       authStore.userDetails = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+       authStore.userDetails = { id: snapshot.docs[0]?.id, ...snapshot.docs[0]?.data() };
     }, (error) => {
         console.error("Error fetching userDetails: ", error); 
     });
