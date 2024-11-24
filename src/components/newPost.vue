@@ -106,12 +106,8 @@ const post = async () => {
       closeModal()
 
       const docRef = await addDoc(collection(db, 'posts'), {
-<<<<<<< HEAD
-        postDetails: postDetails.value,
         group: 'all',
-=======
         postDetails: filter.clean(postDetails.value),
->>>>>>> 1f354966915017241ee4dfae3ae3b62f7da13e99
         postImages: imageUrls,
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,

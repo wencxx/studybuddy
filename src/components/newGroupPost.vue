@@ -43,6 +43,7 @@ import { db, storage } from '../plugins/firebase'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { useAuthStore } from '../store'
+import { Filter } from 'bad-words'
 
 const { group } = defineProps({
   group: String
@@ -88,6 +89,8 @@ const removeImageToPost = (img) => {
 const postDetails = ref('')
 const posting = ref(false)
 
+const filter = new Filter();
+
 const post = async () => {
     const imageUrls = []
 
@@ -106,7 +109,7 @@ const post = async () => {
       closeModal()
 
       const docRef = await addDoc(collection(db, 'posts'), {
-        postDetails: postDetails.value,
+        postDetails: filter.clean(postDetails.value),
         postImages: imageUrls,
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,
