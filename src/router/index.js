@@ -22,6 +22,51 @@ const routes = [
         }
     },
     {
+        path: '/information-technology',
+        name: 'ITNewsfeed',
+        component: () => import('../views/GroupNewsfeed.vue'),
+        meta: {
+            requiresAuth: true,
+            name: 'IT'
+        }
+    },
+    {
+        path: '/industrial-technology',
+        name: 'INDUSNewsfeed',
+        component: () => import('../views/GroupNewsfeed.vue'),
+        meta: {
+            requiresAuth: true,
+            name: 'INDUS'
+        }
+    },
+    {
+        path: '/information-systems',
+        name: 'ISNewsfeed',
+        component: () => import('../views/GroupNewsfeed.vue'),
+        meta: {
+            requiresAuth: true,
+            name: 'IS'
+        }
+    },
+    {
+        path: '/technical-teacher-education',
+        name: 'EDUCNewsfeed',
+        component: () => import('../views/GroupNewsfeed.vue'),
+        meta: {
+            requiresAuth: true,
+            name: 'EDUC'
+        }
+    },
+    {
+        path: '/computer-engineering',
+        name: 'CENewsfeed',
+        component: () => import('../views/GroupNewsfeed.vue'),
+        meta: {
+            requiresAuth: true,
+            name: 'CE'
+        }
+    },
+    {
         path: '/requests',
         name: 'requests',
         component: () => import('../views/Request.vue'),

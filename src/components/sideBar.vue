@@ -9,6 +9,30 @@
                     </router-link>
                 </li>
                 <li>
+                    <div @click="toggleGroups = !toggleGroups" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                        <Icon icon="fluent-mdl2:publish-course" class="text-2xl" />
+                        <span class="text-xl">Courses</span>
+                        <Icon icon="weui:arrow-outlined" class="text-2xl ml-auto duration-150" :class="{ 'rotate-90': toggleGroups }" />
+                    </div>
+                    <div v-if="toggleGroups" class="flex flex-col gap-y-1 pl-10 mt-3">
+                        <router-link :to="{ name: 'ITNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Information Technology</span>
+                        </router-link>
+                        <router-link :to="{ name: 'ISNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Information Systems</span>
+                        </router-link>
+                        <router-link :to="{ name: 'INDUSNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Industrial Technology</span>
+                        </router-link>
+                        <router-link :to="{ name: 'EDUCNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Technical Teacher Education</span>
+                        </router-link>
+                        <router-link :to="{ name: 'CENewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Computer Engineering</span>
+                        </router-link>
+                    </div>
+                </li>
+                <li>
                     <router-link :to="{ name: 'requests' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="carbon:collaborate" class="text-2xl" />
                         <span class="text-xl">Request</span>
@@ -17,7 +41,7 @@
                 <li>
                     <router-link :to="{ name: 'quiz' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedQuiz' }">
                         <Icon icon="mingcute:task-2-fill" class="text-2xl" />
-                        <span class="text-xl">Quiz</span>
+                        <span class="text-xl">Tasks</span>
                     </router-link>
                 </li>
                 <li>
@@ -71,6 +95,7 @@
 <script setup>
 import { ref } from 'vue'
 const toggledMarketplace = ref(false)
+const toggleGroups = ref(false)
 </script>
 
 <style scoped>

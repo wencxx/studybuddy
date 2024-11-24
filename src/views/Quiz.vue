@@ -1,11 +1,11 @@
 <template>
     <div class="flex flex-col gap-y-10">
         <div>
-            <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Quiz</button>
+            <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Task</button>
         </div>
         <div class="flex overflow-hidden">
-            <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Quiz</router-link>
-            <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Quiz</router-link>
+            <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Tasks</router-link>
+            <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
         </div>
 
         <div v-if="quizzes.length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -47,14 +47,14 @@
                             <Icon icon="codicon:debug-start" class="text-blue-500/70 text-lg cursor-pointer" />
                         </router-link>
                         <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
-                          <p class="text-[.6rem] text-center">Start quiz</p>
+                          <p class="text-[.6rem] text-center">Start Task</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div v-else>
-            <p class="text-center -ml-5">No quiz to show</p>
+            <p class="text-center -ml-5">No task to show</p>
         </div>
 
         <!-- share to -->

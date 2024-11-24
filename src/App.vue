@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white font-inter dark:bg-gray-900 text-black dark:text-gray-300">
-      <header class="flex items-center justify-between h-[7dvh] w-full bg-white/0 sticky top-0 backdrop-blur border-b border-gray-100 dark:border-gray-100/10 px-[5dvw] lg:px-[8dvw] xl:px-[15dvw] z-20">
+      <header class="flex items-center justify-between h-[7dvh] w-full bg-white/0 sticky top-0 backdrop-blur border-b border-gray-100 dark:border-gray-100/10 px-[5dvw] lg:px-[8dvw] xl:px-[5dvw] z-20">
         <!-- logo -->
         <div>
           <router-link :to="{ name: 'newsfeed' }">
@@ -134,7 +134,7 @@
         </div>
       </header>
       <!-- body -->
-      <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[8dvw] xl:px-[15dvw] flex gap-x-2">
+      <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[8dvw] xl:px-[5dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
         <router-view :searchQuery="searchQuery" :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
         <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />

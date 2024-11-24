@@ -38,11 +38,15 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, onMounted, ref } from 'vue'
+import { computed, defineEmits, onMounted, ref, defineProps } from 'vue'
 import { db, storage } from '../plugins/firebase'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { useAuthStore } from '../store'
+
+const { group } = defineProps({
+  group: String
+})
 
 const authStore = useAuthStore()
 
@@ -103,12 +107,12 @@ const post = async () => {
 
       const docRef = await addDoc(collection(db, 'posts'), {
         postDetails: postDetails.value,
-        group: 'all',
         postImages: imageUrls,
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,
         photoURL: currentUser.value.photoURL,
         postedAt: Timestamp.now(),
+        group: group
       });
       
       postDetails.value = ''

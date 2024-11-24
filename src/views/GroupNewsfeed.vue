@@ -80,7 +80,7 @@
         <postSkeletonLoader v-else :noOfSkeleton="5" />
 
         <!-- add new post component -->
-        <newPost v-if="addNewPost" @click.self="addNewPost = false" @closeModal="addNewPost = false" />
+        <newGroupPost v-if="addNewPost" @click.self="addNewPost = false" :group="$route.meta.name" @closeModal="addNewPost = false" />
         <!-- edit post component -->
         <editPost v-if="editPostModal" :postDetails="postToEdit" @click.self="editPostModal = false" @closeModal="editPostModal = false" />
         <!-- view comments component -->
@@ -92,7 +92,7 @@
 
 <script setup>
 // components
-import newPost from '../components/newPost.vue'
+import newGroupPost from '../components/newGroupPost.vue'
 import editPost from '../components/editPost.vue'
 import comments from '../components/comments.vue'
 import viewImages from '../components/viewPostImages.vue'
@@ -100,7 +100,7 @@ import postSkeletonLoader from '../components/postSkeletonLoader.vue'
 // mods
 import { formatDistanceToNow } from 'date-fns'
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
 import { onSnapshot, collection, updateDoc, arrayUnion, arrayRemove, query, orderBy, deleteDoc, doc, getCountFromServer, where, addDoc } from 'firebase/firestore'
@@ -110,6 +110,7 @@ import 'vue-toast-notification/dist/theme-sugar.css'
 const $toast = useToast()
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const currentUser = computed(() => authStore.currentUser)
@@ -130,13 +131,20 @@ const togglePostMenu = (postId) => {
 // post collections
 const posts = ref(null)
 
+watch(() => route.meta.name, (newGroupName) => {
+    posts.value = []
+    if (unsubscribe) unsubscribe();
+    getPosts()
+});
+
+
 // get realtime posts
 let unsubscribe
 
 const getPosts = (postId) => {
     unsubscribe = onSnapshot(
         query(collection(db, 'posts'), 
-            where('group', '==', 'all'),
+            where('group', '==', route.meta.name),
             orderBy('postedAt', 'desc')
         ), 
         (snapshot) => {
