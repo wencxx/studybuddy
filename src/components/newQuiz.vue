@@ -224,6 +224,7 @@ const submitQuiz = async () => {
         const newQuiz = {
             id: snapshot.id,
             quizTitle: quizTitle.value,
+            status: 'To do',
             dueDate: dueDate.value,
             ...quizzes.value
         }

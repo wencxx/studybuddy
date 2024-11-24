@@ -36,6 +36,7 @@
                 </div>
                 <!-- quiz footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
+                    <p class="mr-auto bg-orange-500 rounded px-2" :class="{ 'bg-green-500': quiz.status === 'Completed' }">{{ quiz.status }}</p>
                     <div class="group relative" @click="viewAnswered(quiz.id)">
                         <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-lg cursor-pointer" />
                         <div class="absolute !w-24 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
