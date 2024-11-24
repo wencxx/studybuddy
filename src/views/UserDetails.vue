@@ -183,7 +183,7 @@ import comments from '../components/comments.vue'
 import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
-import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp, and } from 'firebase/firestore';
 import { db, storage, auth } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
@@ -262,7 +262,10 @@ const getUserPosts = async () => {
   onSnapshot(
     query(
         collection(db, 'posts'),
-        where('userId', '==', route.params.id),
+        and(
+            where('userId', '==', route.params.id),
+            where('group', '==', 'all'),
+        ),
         orderBy('postedAt', 'desc')
     ),
     (snapshot) => {

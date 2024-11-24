@@ -4,12 +4,17 @@
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Task</button>
         </div>
         <div class="flex overflow-hidden">
-            <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">My Tasks</router-link>
-            <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 !text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
+            <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">My Tasks</router-link>
+            <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
+            <select class="ml-auto bg-transparent text-black dark:text-white border px-3 rounded focus:outline-none" v-model="filterQuery">
+                <option class="dark:text-black" value="">All tasks</option>
+                <option class="dark:text-black" value="To do">To do</option>
+                <option class="dark:text-black" value="Completed">Completed</option>
+            </select>
         </div>
 
-        <div v-if="quizzes.length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <div v-for="(quiz, index) in quizzes" :key="index" class="h-fit border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col gap-y-3">
+        <div v-if="filteredQuizzes().length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div v-for="(quiz, index) in filteredQuizzes()" :key="index" class="h-fit border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col gap-y-3">
                 <!-- quiz header -->
                 <div class="flex items-center justify-between">
                     <div class="border border-blue-500 w-10 aspect-square rounded-lg flex items-center justify-center">
@@ -186,6 +191,15 @@ const currentUser = computed(() => authStore.currentUser)
 
 const quizzes = ref([])
 
+const filterQuery = ref('')
+
+const filteredQuizzes = () => {
+    if(!filterQuery.value) return quizzes.value
+
+    if(filterQuery.value === 'To do') return quizzes.value.filter(quiz => quiz.status === 'To do')
+    if(filterQuery.value === 'Completed') return quizzes.value.filter(quiz => quiz.status === 'Completed')
+}
+
 // quiz collection
 const quizRef = collection(db, 'quizzes')
 
@@ -194,7 +208,6 @@ const getQuizzes = async () => {
     const q = query(
         quizRef,
         and(
-            where('status', '==', 'to do'),
             where('sharedTo', 'array-contains', currentUser.value.uid),
         )
     )

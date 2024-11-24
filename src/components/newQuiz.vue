@@ -3,14 +3,14 @@
     <form @submit.prevent="submitQuiz" class="bg-gray-100 dark:bg-gray-900 w-3/4 md:w-2/4 xl:w-1/4 h-fit rounded-xl border border-gray-100/10 p-5 flex flex-col gap-y-5">
       <!-- modal header -->
       <div class="flex items-center justify-between">
-        <h2>Add new quiz</h2>
+        <h2>Add new task</h2>
         <Icon icon="ic:baseline-close" class="cursor-pointer text-xl" @click="closeModal" />
       </div>
       <!-- modal body -->
       <p v-if="invalidDueDate" class="bg-red-500 rounded pl-2">Invalid due date</p>
       <div class="flex gap-x-2">
             <div class="flex flex-col w-1/2 gap-y-2">
-                <label>Quiz Title</label>
+                <label>Task Title</label>
                 <input type="text" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Quiz title" v-model="quizTitle">
             </div>
             <div class="flex flex-col w-1/2 gap-y-2">
@@ -215,7 +215,7 @@ const submitQuiz = async () => {
             quizTimer: quizTimer.value,
             dueDate: dueDate.value,
             quizzes: quizzes.value,
-            status: 'to do',
+            status: 'To do',
             userId:  currentUser.value.uid
         })
 

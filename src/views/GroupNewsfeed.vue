@@ -43,6 +43,19 @@
                     <div>
                         <p class="line-clamp-4">{{ post.postDetails }}</p>
                     </div>
+                    <!-- attachments -->
+                    <div v-if="post.postAttachments && post.postAttachments?.length" class="flex">
+                        <a v-for="(attachments, index) in post.postAttachments" :key="index" :href="attachments" target="_blank" class="relative group">
+                            <Icon icon="bxs:file-pdf" class="text-4xl" v-if="attachments.includes('pdf')" />
+                            <Icon icon="bxs:file-doc" class="text-4xl" v-else />
+                            <p class="text-xs absolute hidden group-hover:block">
+                                {{  attachments.split('%')[1] }}
+                                <span v-if="attachments.includes('pdf')">.pdf</span>
+                                <span v-if="attachments.includes('docx')">.docx</span>
+                                <span v-if="attachments.includes('docs')">.docs</span>
+                            </p>
+                        </a>
+                    </div>
                     <!-- images -->
                     <div v-if="post.postImages && post.postImages?.length > 0" class="grid grid-cols-2 gap-1"  :class="{'!grid-cols-1': post.postImages?.length === 1}">
                         <div v-for="(imageUrl, index) in post.postImages" :key="index" class="relative rounded cursor-pointer overflow-hidden" :class="{ 'hidden': index > 3, 'col-span-2': post.postImages?.length === 3 && index === 2 }" @click="viewPostImages(post.postImages, index)" >
