@@ -21,11 +21,18 @@
               </div>
             </div>
         </div>
+        <div class="flex flex-wrap text-xs">
+          <p v-for="file in fileNames" :key="file" class="relative" @click="removeFilesToPost(file)">
+            <Icon icon="bxs:file-pdf" class="text-4xl" v-if="file.includes('pdf')" />
+            <Icon icon="bxs:file-doc" class="text-4xl" v-else />
+          </p>
+        </div>
         <!-- add media -->
         <div class="flex">
           <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addImage" />
           <input @change="handleImageUpload" type="file" class="hidden" accept=".jpg, .png, .jpeg" id="imageInput" multiple>
-          <!-- <Icon icon="material-symbols-light:video-library-outline" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" /> -->
+          <Icon icon="material-symbols-light:attachment-rounded" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addFile" />
+          <input @change="handleFileUpload" type="file" class="hidden" accept=".pdf, .docx, docs" id="fileInput" multiple>
         </div>
         <!-- buttons -->
         <div>
@@ -81,6 +88,34 @@ const removeImageToPost = (img) => {
   }
 }
 
+// files to post
+const files = ref([])  
+const fileNames = ref([])  
+const tempFileUrls = ref([])
+
+// handle file to post
+const handleFileUpload = (event) => {
+  // const file = event.target.files[0]
+  Array.from(event.target.files).forEach(file => {
+    const tempUrl = URL.createObjectURL(file);
+    tempFileUrls.value.push(tempUrl);
+    files.value.push(file);
+    fileNames.value.push(file.name);
+  });
+}
+
+// remove image to post
+const removeFilesToPost = (file) => {
+  const index = fileNames.value.indexOf(file)
+
+  if (index !== -1) {
+    fileNames.value.splice(index, 1)
+    files.value.splice(index, 1)
+  }
+}
+
+
+
 //add post
 const postDetails = ref('')
 const posting = ref(false)
@@ -90,6 +125,7 @@ const filter = new Filter();
 const post = async () => {
 
     const imageUrls = []
+    const fileUrls = []
 
     try {
       posting.value = true
@@ -103,12 +139,22 @@ const post = async () => {
         }
       }
 
+      if(files.value.length > 0){
+        for(const file of files.value){
+          const fileRef =  storageRef(storage, `posts/${file.name}`)
+          await uploadBytes(fileRef, file)
+          const  fileLinks = await getDownloadURL(fileRef)
+          fileUrls.push(fileLinks)
+        }
+      }
+
       closeModal()
 
       const docRef = await addDoc(collection(db, 'posts'), {
         group: 'all',
         postDetails: filter.clean(postDetails.value),
         postImages: imageUrls,
+        postAttachments: fileUrls,
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,
         photoURL: currentUser.value.photoURL,
@@ -126,6 +172,11 @@ const post = async () => {
 const addImage = () => {
   const imageInput = document.getElementById('imageInput')
   imageInput.click()
+}
+
+const addFile = () => {
+  const fileInput = document.getElementById('fileInput')
+  fileInput.click()
 }
 </script>
 

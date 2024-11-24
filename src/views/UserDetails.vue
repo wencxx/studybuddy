@@ -16,7 +16,7 @@
                 <h2 class="text-2xl">{{ user.displayName }}</h2>
                 <p class="text-sm">{{ user.email }}</p>
             </div>
-            <div class="absolute right-0 top-3 flex flex-col items-end">
+            <div  v-if="user.userId === currentUser.uid" class="absolute right-0 top-3 flex flex-col items-end">
                 <Icon icon="mdi:dots-vertical" class="text-2xl text-gray-100/50 cursor-pointer" @click="toggledProfileMenu = true" />
                 <div v-if="toggledProfileMenu" class="bg-neutral-800 p-2 rounded">
                     <p class="text-xs cursor-pointer" @click="passwordModal = true">change password</p>
