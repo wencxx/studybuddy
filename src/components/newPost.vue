@@ -43,6 +43,7 @@ import { db, storage } from '../plugins/firebase'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { useAuthStore } from '../store'
+import { Filter } from 'bad-words'
 
 const authStore = useAuthStore()
 
@@ -84,7 +85,10 @@ const removeImageToPost = (img) => {
 const postDetails = ref('')
 const posting = ref(false)
 
+const filter = new Filter();
+
 const post = async () => {
+
     const imageUrls = []
 
     try {
@@ -102,8 +106,12 @@ const post = async () => {
       closeModal()
 
       const docRef = await addDoc(collection(db, 'posts'), {
+<<<<<<< HEAD
         postDetails: postDetails.value,
         group: 'all',
+=======
+        postDetails: filter.clean(postDetails.value),
+>>>>>>> 1f354966915017241ee4dfae3ae3b62f7da13e99
         postImages: imageUrls,
         userId: currentUser.value.uid,
         name: currentUser.value.displayName,
@@ -112,7 +120,6 @@ const post = async () => {
       });
       
       postDetails.value = ''
-      // console.log('Document written with ID: ', docRef.id);
     } catch (error) {
       console.error('Error creating post: ', error);
     }finally{
