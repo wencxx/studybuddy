@@ -86,9 +86,10 @@
         </div>
         <!-- profile -->
         <div class="hidden lg:flex items-center gap-x-2">
-          <div  v-if="authStore.isAuthenticated" class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
-            <input type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block" v-model="searchQuery">
-            <Icon icon="mynaui:search" class="text-gray-400 dark:text-white text-2xl" />
+          <div v-if="authStore.isAuthenticated" class="px-2 border dark:border-gray-100/10 rounded overflow-hidden h-8 flex items-center">
+            <input v-if="$route.name === 'notes' || $route.name === 'sharedNotes'" type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block" v-model="searchQuery">
+            <input v-else type="text" placeholder="Search" class="bg-transparent focus:outline-none dark:text-gray-300 hidden md:block" @keyup="search" v-model="searchQuery">
+            <Icon icon="mynaui:search" class="text-gray-400 dark:text-white text-2xl" @click="searchByClicking" />
           </div>
           <button class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group" @click="toggleDarkmode">
             <Icon icon="ic:twotone-dark-mode" class="hidden dark:block text-2xl" />
@@ -136,7 +137,7 @@
       <!-- body -->
       <div class="h-[93dvh] w-full bg-custom-primary px-[5dvw] lg:px-[8dvw] xl:px-[5dvw] flex gap-x-2">
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
-        <router-view :searchQuery="searchQuery" :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh]" />
+        <router-view :searchQuery="searchQuery" :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh] pr-5" />
         <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
       </div>
   </div>
@@ -311,6 +312,30 @@ const getMessages = async (uid) => {
 
 const toggleDarkmode = () => {
   document.documentElement.classList.toggle('dark')
+}
+
+const search = () => {
+  if(!searchQuery.value) return
+
+  if(event.key === 'Enter'){
+    router.push({
+      name: 'search',
+      query: {
+        q: searchQuery.value
+      }
+    })
+  }
+}
+
+const searchByClicking = () => {
+  if(!searchQuery.value) return
+
+   router.push({
+      name: 'search',
+      query: {
+        q: searchQuery.value
+      }
+  })
 }
 </script>
 

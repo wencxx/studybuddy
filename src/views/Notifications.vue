@@ -5,9 +5,9 @@
             <h1>Today</h1>
             <div v-for="notification in notifications" :key="notification.id" @click="redirectToLink(notification.link, notification.id)" >
                 <div v-if="checkDateIfToday(notification.notifiedAt)" class="bg-gray-100 dark:bg-neutral-700 p-2 px-3 rounded-xl flex items-center gap-x-2 cursor-pointer" :class="{ '!bg-gray-200 dark:!bg-neutral-600': !notification.isRead }" >
-                    <div class="w-11 aspect-square rounded-full overflow-hidden">
+                    <div class="w-11 aspect-square rounded-full overflow-hidden border-white">
                         <img v-if="notification.photoURL !== null" :src="notification.photoURL" alt="profile picture" class="w-full aspect-square">
-                        <div class="w-full aspect-square bg-white dark:bg-gray-100/55 flex items-center justify-center">
+                        <div v-else class="w-full aspect-square bg-white dark:bg-gray-100/55 flex items-center justify-center">
                             <Icon icon="mdi:user" class="text-3xl text-black" />
                         </div>
                     </div>
@@ -30,8 +30,8 @@
             <div v-for="notification in notifications" :key="notification.id" @click="redirectToLink(notification.link, notification.id)" >
                 <div v-if="!checkDateIfToday(notification.notifiedAt)" class="bg-gray-100 dark:bg-neutral-700 p-2 px-3 rounded-xl flex items-center gap-x-2 cursor-pointer" :class="{ '!bg-gray-200 dark:!bg-neutral-600': !notification.isRead }" >
                     <div class="w-11 aspect-square rounded-full overflow-hidden">
-                        <img v-if="!notification.photoURL" :src="notification.photoURL" alt="profile picture" class="w-full aspect-square">
-                        <div class="w-full aspect-square bg-white dark:bg-gray-100/55 flex items-center justify-center">
+                        <img v-if="notification.photoURL !== null" :src="notification.photoURL" alt="profile picture" class="w-full aspect-square">
+                        <div v-else class="w-full aspect-square bg-white dark:bg-gray-100/55 flex items-center justify-center">
                             <Icon icon="mdi:user" class="text-3xl text-black" />
                         </div>
                     </div>

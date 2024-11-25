@@ -51,19 +51,19 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'calendar' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedNotes' }">
+                    <router-link  :to="{ name: 'calendar' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'calendar' }">
                         <Icon icon="tabler:calendar" class="text-2xl"/>
                         <span class="text-xl">Calendar</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'rate' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedNotes' }">
+                    <router-link  :to="{ name: 'rate' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'rate' }">
                         <Icon icon="iconoir:star" class="text-2xl"/>
                         <span class="text-xl">Rate Us</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'feedback' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedNotes' }">
+                    <router-link  :to="{ name: 'feedback' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'feedback' }">
                         <Icon icon="mdi:feedback-outline" class="text-2xl"/>
                         <span class="text-xl">Feedback</span>
                     </router-link>
