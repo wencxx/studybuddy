@@ -65,6 +65,15 @@
                     <p>score</p>
                 </div>
                 <p v-if="quiz.quizTimer" class="text-center text-sm">Finished in {{ timeConsumed }}</p>
+                <div class="flex gap-x-2">
+                    <Icon
+                        v-for="star in 5"
+                        :key="'q1-star-' + star"
+                        :icon="star <= ratings ? 'iconoir:star-solid' : 'iconoir:star'"
+                        :class="['text-3xl cursor-pointer', star <= ratings ? 'text-yellow-500' : 'text-black']"
+                        @click="rate(star)"
+                    />
+                </div>
                 <div class="flex gap-x-5 lg:px-10 w-full">
                     <button v-if="retaking" class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500 animate-pulse">Retaking</button>
                     <button v-else class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500" @click="retake">Retake</button>
@@ -77,7 +86,7 @@
 
 <script setup>
 import { db } from '../plugins/firebase'
-import { doc, getDoc, collection, addDoc, Timestamp } from 'firebase/firestore'
+import { doc, getDoc, collection, addDoc, Timestamp, updateDoc } from 'firebase/firestore'
 import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import moment from 'moment'
@@ -125,31 +134,31 @@ const startQuiz = () => {
 }
 
 // quiz timer if it has
-const minutes = ref(0);
-const seconds = ref(59);
-let timerInterval = null;
+const minutes = ref(0)
+const seconds = ref(59)
+let timerInterval = null
 
 const startTimer = () => {
     timerInterval = setInterval(() => {
         if (minutes.value === 0 && seconds.value === 0) {
-            clearInterval(timerInterval); 
+            clearInterval(timerInterval) 
         } else {
             if (seconds.value === 0) {
-                seconds.value = 59;
-                minutes.value--;
+                seconds.value = 59
+                minutes.value--
             } else {
-                seconds.value--;
+                seconds.value--
             }
         }
-    }, 1000);
-};
+    }, 1000)
+}
 
 watchEffect(() => {
     if (quiz.value.quizTimer !== null) {
-        minutes.value = quiz.value.quizTimer - 1; 
-        seconds.value = 59; 
+        minutes.value = quiz.value.quizTimer - 1 
+        seconds.value = 59 
     }
-});
+})
 
 
 // submit quiz
@@ -208,6 +217,22 @@ const retake = () => {
         seconds.value = 59
         retaking.value = false
     }, 1000)
+}
+
+const ratings = ref(0)
+
+// rate
+const rate = async (rating) => {
+    ratings.value = rating
+
+    const docRef = doc(db, 'quizzes', quizId)
+    try {
+        await updateDoc(docRef, {
+            ratings: rating
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 onMounted(() => {

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="user" class="flex flex-col gap-y-5 mx-auto px-10 md:px-20" id="container" @click.self="toggledProfileMenu = false">
+    <div v-if="user" class="flex flex-col gap-y-5 mx-auto md:px-20" id="container" @click.self="toggledProfileMenu = false">
         <div class="flex items-center gap-x-5 relative">
             <div class="relative group">
                 <img v-if="user.photoURL" :src="user.photoURL" alt="profilePic" class="h-16 aspect-square rounded-full object-cover">
@@ -24,8 +24,17 @@
             </div>
         </div>
         <div>
-            <p class="text-sm text-gray-100/55">Course: {{ user.course }}</p>
-            <p class="text-sm text-gray-100/55">Year & Section: {{ user.yearSection }}</p>
+            <p class="text-sm dark:text-gray-100/55">Course: {{ user.course }}</p>
+            <p class="text-sm dark:text-gray-100/55">Year & Section: {{ user.yearSection }}</p>
+            <div class="flex gap-x-2 mt-2">
+                <p class="text-sm dark:text-gray-100/55">Ratings:</p>
+                <Icon
+                    v-for="star in 5"
+                    :key="'q1-star-' + star"
+                    :icon="star <= ratings ? 'iconoir:star-solid' : 'iconoir:star'"
+                    :class="['text-lg cursor-pointer', star <= ratings ? 'text-yellow-500' : 'text-black']"
+                />
+            </div>
         </div>
         <div v-if="user.userId !== currentUser.uid" class="flex gap-x-5">
             <div class="w-1/2" :class="{ '!w-full': isCollaborated(user?.userId) === 'request'}">
@@ -210,14 +219,16 @@ const getUser = async () => {
     limit(1)
   );
 
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await getDocs(q)
   querySnapshot.forEach((doc) => {
     user.value = {
         id: doc.id,
         ...doc.data()
-    };
-  });
-};
+    }
+  })
+
+    getRatings()
+}
 
 // view post images
 const viewImagesModal = ref(false)
@@ -250,7 +261,7 @@ const toggleComment = (postDets) => {
         toggledComment.value = false
         router.push({
             query: {}
-        });
+        })
     }
 
 }
@@ -272,7 +283,7 @@ const getUserPosts = async () => {
         posts.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     }
   )
-};
+}
 
 // edit post
 const editPostModal = ref(false)
@@ -286,9 +297,9 @@ const editPostSigle = (postId) => {
 }
 
 const formatDate = (firestoreTimestamp) => {
-     const date = firestoreTimestamp.toDate();
+     const date = firestoreTimestamp.toDate()
   
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNow(date, { addSuffix: true })
 }
 
 
@@ -299,15 +310,15 @@ const toggleCollab = async (type, id) => {
     if(type === 'request'){
         try {
             // sent the request
-            const sendRequest = query(collection(db, 'users'), where('userId', '==', currentUser.value?.uid));
+            const sendRequest = query(collection(db, 'users'), where('userId', '==', currentUser.value?.uid))
 
-            const querySnapshot = await getDocs(sendRequest);
+            const querySnapshot = await getDocs(sendRequest)
 
             querySnapshot.forEach(async (doc) => {
                 await updateDoc(doc.ref, {
                     outgoingCollabRequest: arrayUnion(id)
-                }); 
-            });
+                }) 
+            })
 
             // receive the request
             const reeceiveRequest = query(collection(db, 'users'), where('userId', '==', id));
@@ -621,7 +632,37 @@ const changePassword = async () => {
     } catch (error) {
         console.error('Error updating password:', error);
     }
-};
+}
+
+// get ratings
+const ratings = ref(0)
+
+const getRatings = async () => {
+    try {
+        const q = query(
+            collection(db, 'quizzes'),
+            and(
+                where('userId', '==', route.params.id),
+                where('ratings', '!=', null),
+            )
+        )
+
+        const snapshots = await getDocs(q)
+
+        let ratingsLength = snapshots.docs.length
+        let sumRatings = 0 
+
+        snapshots.docs.forEach(doc => {
+            sumRatings += doc.data().ratings
+        })
+
+        ratings.value = sumRatings / ratingsLength
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 
 onMounted(() => {
     getUser();

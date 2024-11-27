@@ -1,6 +1,6 @@
 <template>
     <div class="mx-auto flex items-center justify-center gap-y-10">
-        <form @submit.prevent="login" class="w-full md:w-4/5 xl:w-2/3 border border-gray-300 dark:border-gray-100/10 p-5 rounded-md flex flex-col gap-y-4 items-center">
+        <form @submit.prevent="login" class="w-full md:w-4/5 xl:w-2/4 border border-gray-300 dark:border-gray-100/10 p-5 rounded-md flex flex-col gap-y-4 items-center">
             <h1 class="text-2xl font-semibold dark:!text-white"><span class="text-blue-500">Study</span>Buddy</h1>
             <p v-if="invalidCredentials" class="text-sm bg-red-500 w-full pl-2 rounded py-1">Invalid Credentials</p>
             <div class="flex flex-col gap-y-1 w-full">
