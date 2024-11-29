@@ -37,7 +37,7 @@
             <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/3"></div>
             <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/2 self-end"></div>
         </div>
-        <form @submit.prevent="sendMessage(user?.userId)" class="h-14 w-full mb-1 flex gap-x-2">
+        <form @submit.prevent="sendMessage(user?.userId)" class="h-14 w-full mb-5 flex gap-x-2">
             <input v-model="message" type="text" placeholder="Enter a message" class="h-full focus:outline-none rounded-md bg-transparent pl-2 border border-gray-300 dark:border-gray-100/10 w-full">
             <button type="submit" class="bg-blue-500 w-1/5 h-full rounded-md text-white hover:bg-blue-600/90">Send</button>
         </form>

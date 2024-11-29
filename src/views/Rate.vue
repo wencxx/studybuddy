@@ -4,7 +4,7 @@
         <div class="space-y-10">
             <!-- Question 1 -->
             <div class="flex flex-col gap-y-2">
-                <label>1. How easy was it to navigate the StudyBuddy app?  </label>
+                <label>1. How easy was it to navigate the StudyBuddy app? </label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -18,7 +18,7 @@
 
             <!-- Question 2 -->
             <div class="flex flex-col gap-y-2">
-                <label>2. How satisfied are you with the app's features like tagging, categorization, and real-time collaboration?  </label>
+                <label>2. How satisfied are you with the app's features like tagging, categorization, and real-time collaboration?</label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -60,7 +60,7 @@
 
             <!-- Question 5 -->
             <div class="flex flex-col gap-y-2">
-                <label>5. How satisfied are you with the overall performance of StudyBuddy? </label>
+                <label>5. How engaging do you find the features of StudyBuddy in terms of keeping you involved in your studies?</label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -68,6 +68,48 @@
                         :icon="star <= ratings.q5 ? 'iconoir:star-solid' : 'iconoir:star'"
                         :class="['text-3xl cursor-pointer', star <= ratings.q5 ? 'text-yellow-500' : 'text-black dark:text-white']"
                         @click="rate('q5', star)"
+                    />
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="flex flex-col gap-y-2">
+                <label>6. How helpful is StudyBuddy in improving your productivity in organizing study materials?</label>
+                <div class="flex gap-x-2">
+                    <Icon
+                        v-for="star in 5"
+                        :key="'q6-star-' + star"
+                        :icon="star <= ratings.q6 ? 'iconoir:star-solid' : 'iconoir:star'"
+                        :class="['text-3xl cursor-pointer', star <= ratings.q6 ? 'text-yellow-500' : 'text-black dark:text-white']"
+                        @click="rate('q6', star)"
+                    />
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="flex flex-col gap-y-2">
+                <label>7. How much has StudyBuddy contributed to improving your academic performance?</label>
+                <div class="flex gap-x-2">
+                    <Icon
+                        v-for="star in 5"
+                        :key="'q7-star-' + star"
+                        :icon="star <= ratings.q7 ? 'iconoir:star-solid' : 'iconoir:star'"
+                        :class="['text-3xl cursor-pointer', star <= ratings.q7 ? 'text-yellow-500' : 'text-black dark:text-white']"
+                        @click="rate('q7', star)"
+                    />
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="flex flex-col gap-y-2">
+                <label>8. How satisfied are you with the overall performance of StudyBuddy?</label>
+                <div class="flex gap-x-2">
+                    <Icon
+                        v-for="star in 5"
+                        :key="'q8-star-' + star"
+                        :icon="star <= ratings.q8 ? 'iconoir:star-solid' : 'iconoir:star'"
+                        :class="['text-3xl cursor-pointer', star <= ratings.q8 ? 'text-yellow-500' : 'text-black dark:text-white']"
+                        @click="rate('q8', star)"
                     />
                 </div>
             </div>
@@ -100,6 +142,9 @@ const ratings = ref({
     q3: 0,
     q4: 0,
     q5: 0,
+    q6: 0,
+    q7: 0,
+    q8: 0,
 });
 
 // Function to handle rating selection
@@ -127,6 +172,9 @@ const submitRating = async () => {
                     q3: 0,
                     q4: 0,
                     q5: 0,
+                    q6: 0,
+                    q7: 0,
+                    q8: 0,
                 }
         } 
     } catch (error) {

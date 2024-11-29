@@ -156,6 +156,11 @@ const routes = [
                 path: 'listings',
                 name: 'listings',
                 component: () => import('../views/child/marketplaceListings.vue')
+            },
+            {
+                path: 'product-details/:id',
+                name: 'prodDetails',
+                component: () => import('../views/child/productDetails.vue')
             }
         ]
     },

@@ -8,20 +8,20 @@
                 <h2 class="text-md">{{ list.productName }}</h2>
                 <p class="text-sm line-clamp-1">{{ list.productDescription }}</p>
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <router-link :to="{ name: 'marketplaceMessage', params: { id: list.userId }, query: { item: list.id } }" v-if="list.userId !== currentUser.uid" class="group relative" @click="shareNote(note.id)">
+                    <router-link :to="{ name: 'marketplaceMessage', params: { id: list.userId }, query: { item: list.id } }" class="group relative">
                         <Icon icon="mage:message" class="text-blue-500/70 text-xl cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Inquire</p>
                         </div>
                     </router-link>
-                    <div class="group relative">
+                    <router-link class="group relative" :to="{ name: 'prodDetails', params: { id: list.id } }">
                         <div>
                             <Icon icon="mdi:eye-outline" class="text-blue-500/70 text-2xl cursor-pointer" />
                         </div>
                         <div class="absolute !w-16 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">View details</p>
                         </div>
-                    </div>
+                    </router-link>
                 </div>
             </div>
         </div>
