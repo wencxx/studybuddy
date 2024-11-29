@@ -4,7 +4,7 @@
         <div class="space-y-10">
             <!-- Question 1 -->
             <div class="flex flex-col gap-y-2">
-                <label>1. How often do you use StudyBuddy? (Daily, Weekly, Monthly, Rarely)</label>
+                <label>1. How easy was it to navigate the StudyBuddy app?  </label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -18,7 +18,7 @@
 
             <!-- Question 2 -->
             <div class="flex flex-col gap-y-2">
-                <label>2. How enjoyable do you find using StudyBuddy? (Very Enjoyable, Somewhat Enjoyable, Neutral, Not Enjoyable)</label>
+                <label>2. How satisfied are you with the app's features like tagging, categorization, and real-time collaboration?  </label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -32,7 +32,7 @@
 
             <!-- Question 3 -->
             <div class="flex flex-col gap-y-2">
-                <label>3. Do you feel StudyBuddy has helped you create a sense of community with other students? (Strongly Agree, Agree, Neutral, Disagree, Strongly Disagree)</label>
+                <label>3. How helpful was the task assignment and tracking feature for managing your academic tasks?</label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -46,7 +46,7 @@
 
             <!-- Question 4 -->
             <div class="flex flex-col gap-y-2">
-                <label>4. How helpful is StudyBuddy in organizing your study tasks? (Very Helpful, Somewhat Helpful, Neutral, Not Helpful)</label>
+                <label>4. How effective was the app in supporting your collaborative learning activities?</label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
@@ -60,7 +60,7 @@
 
             <!-- Question 5 -->
             <div class="flex flex-col gap-y-2">
-                <label>5. How satisfied are you with StudyBuddy overall? (Very Satisfied, Somewhat Satisfied, Neutral, Somewhat Dissatisfied, Very Dissatisfied)</label>
+                <label>5. How satisfied are you with the overall performance of StudyBuddy? </label>
                 <div class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
