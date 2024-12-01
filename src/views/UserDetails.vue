@@ -26,13 +26,15 @@
         <div>
             <p class="text-sm dark:text-gray-100/55">Course: {{ user.course }}</p>
             <p class="text-sm dark:text-gray-100/55">Year & Section: {{ user.yearSection }}</p>
-            <div class="flex gap-x-2 mt-2">
-                <p class="text-sm dark:text-gray-100/55">Ratings:</p>
+            <p class="text-sm dark:text-gray-100/55">Ratings: {{ overAllRatings() || 0 }}</p>
+            <div class="flex gap-x-2 mt-2" v-if="currentUser.uid !== $route.params.id">
+                <p class="text-sm dark:text-gray-100/55">Rate:</p>
                 <Icon
                     v-for="star in 5"
                     :key="'q1-star-' + star"
-                    :icon="star <= ratings ? 'iconoir:star-solid' : 'iconoir:star'"
-                    :class="['text-lg cursor-pointer', star <= ratings ? 'text-yellow-500' : 'text-black']"
+                    :icon="star <= getCurrentUserRating() ? 'iconoir:star-solid' : 'iconoir:star'"
+                    :class="['text-lg cursor-pointer', star <= getCurrentUserRating() ? 'text-yellow-500' : 'dark:text-white']"
+                    @click="rate(star)"
                 />
             </div>
         </div>
@@ -192,7 +194,7 @@ import comments from '../components/comments.vue'
 import editPost from '../components/editPost.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { ref, onMounted, computed, watch } from 'vue';
-import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp, and } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp, and, getDoc } from 'firebase/firestore';
 import { db, storage, auth } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
@@ -219,15 +221,20 @@ const getUser = async () => {
     limit(1)
   );
 
-  const querySnapshot = await getDocs(q)
-  querySnapshot.forEach((doc) => {
-    user.value = {
-        id: doc.id,
-        ...doc.data()
-    }
-  })
+//   const querySnapshot = await getDocs(q)
 
-    getRatings()
+  onSnapshot(
+    q,
+    (snapshots) => {
+        user.value = null
+        snapshots.forEach((doc) => {
+            user.value = {
+                id: doc.id,
+                ...doc.data()
+            }
+        })
+    }
+  )
 }
 
 // view post images
@@ -636,32 +643,53 @@ const changePassword = async () => {
 
 // get ratings
 const ratings = ref(0)
-
-const getRatings = async () => {
-    try {
-        const q = query(
-            collection(db, 'quizzes'),
-            and(
-                where('userId', '==', route.params.id),
-                where('ratings', '!=', null),
-            )
-        )
-
-        const snapshots = await getDocs(q)
-
-        let ratingsLength = snapshots.docs.length
-        let sumRatings = 0 
-
-        snapshots.docs.forEach(doc => {
-            sumRatings += doc.data().ratings
-        })
-
-        ratings.value = sumRatings / ratingsLength
-    } catch (error) {
-        console.log(error)
+const rate = async (rate) => {
+    if (!currentUser.value?.uid) {
+        console.log("User not logged in");
+        return;
     }
+
+    try {
+        const docRef = doc(db, 'users', user.value.id);
+
+        const userSnapshot = await getDoc(docRef);
+        if (userSnapshot.exists()) {
+            const userData = userSnapshot.data();
+            const updatedRatings = (userData.ratings || []).filter(r => r.id !== currentUser.value.uid);
+
+            updatedRatings.push({
+                id: currentUser.value.uid,
+                rating: rate
+            });
+
+            await updateDoc(docRef, { ratings: updatedRatings });
+        } else {
+            console.log("User not found in the database");
+        }
+    } catch (error) {
+        console.error("Error updating ratings:", error);
+    }
+};
+
+// filter ratings
+const getCurrentUserRating = () => {
+    const currenrUserRating = user.value?.ratings?.find(rating => rating.id === currentUser.value?.uid)
+
+
+    return currenrUserRating?.rating
 }
 
+const overAllRatings = () => {
+    const overallRatings = user.value?.ratings?.reduce((acc, rating) => {
+        acc += rating.rating
+
+        return acc
+    }, 0)
+
+    const average = overallRatings / user.value?.ratings?.length
+
+    return average
+}
 
 
 onMounted(() => {
@@ -669,6 +697,10 @@ onMounted(() => {
     getUserPosts()
     watch(posts.value, () => {
         posts.value.forEach(post => countComments(post.id))
+    })
+    watch(() => route.params.id, () => {
+        getUser();
+        getUserPosts()
     })
 });
 </script>

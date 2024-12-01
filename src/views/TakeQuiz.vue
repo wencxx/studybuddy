@@ -65,7 +65,7 @@
                     <p>score</p>
                 </div>
                 <p v-if="quiz.quizTimer" class="text-center text-sm">Finished in {{ timeConsumed }}</p>
-                <div class="flex gap-x-2">
+                <!-- <div v-if="currentUser.uid !== quiz.userId" class="flex gap-x-2">
                     <Icon
                         v-for="star in 5"
                         :key="'q1-star-' + star"
@@ -73,7 +73,7 @@
                         :class="['text-3xl cursor-pointer', star <= ratings ? 'text-yellow-500' : 'text-black']"
                         @click="rate(star)"
                     />
-                </div>
+                </div> -->
                 <div class="flex gap-x-5 lg:px-10 w-full">
                     <button v-if="retaking" class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500 animate-pulse">Retaking</button>
                     <button v-else class="border border-blue-500 w-full lg:w-1/2 rounded text-blue-500" @click="retake">Retake</button>
