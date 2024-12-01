@@ -130,6 +130,7 @@ const createListing = async () => {
 
         const snapshot = await addDoc(marketplaceRef, {
             ...productData.value,
+            status: 'available',
             userId: currentUser.value.uid
         })
 

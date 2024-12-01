@@ -29,7 +29,7 @@
                 </div>
                 <div class="grid w-full gap-1" :class="{ 'grid-cols-2': message.images.length > 1 }">
                     <div v-for="image in message.images" :key="image" >
-                        <img :src="image" :alt="image" class="w-full aspect-square border dark:border-gray-100/10 rounded-md">
+                        <img :src="image" :alt="image" class="w-full aspect-square border dark:border-gray-100/10 rounded-md cursor-pointer" @click="viewImages(image)">
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -100,6 +100,11 @@
                 Send
             </button>
         </form>
+
+        <div v-if="viewImage" class="fixed top-0 left-0 h-screen w-screen bg-black/10 z-20 flex items-center justify-center">
+            <Icon icon="mdi:close" class="top-5 right-5 absolute text-3xl cursor-pointer" @click="viewImage = false" />
+            <img :src="imageToView" alt="iamge to view" class="h-1/2 lg:h-[90%] aspect-auto">
+        </div>
     </div>
 </template>
 
@@ -292,6 +297,14 @@ const getMessages = () => {
     }
 }
 
+const viewImage = ref(false)
+const imageToView = ref('')
+
+const viewImages = (imageLink) => {
+    viewImage.value = true
+    imageToView.value = imageLink
+}
+
 const getFileName = (fileUrl) => {
     const decodedUrl = decodeURIComponent(fileUrl);
     return decodedUrl.split("/").pop().split("?")[0];
@@ -338,6 +351,7 @@ const viewAllMessages = async () => {
 
 onMounted(() => {
     getUser()
+    viewAllMessages()
     watch(messages.value, () => {
         viewAllMessages()
     })

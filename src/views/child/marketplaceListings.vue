@@ -7,8 +7,10 @@
                 <h1 class="font-bold text-lg">Php {{ list.productPrice }}</h1>
                 <h2 class="text-md">{{ list.productName }}</h2>
                 <p class="text-sm line-clamp-1">{{ list.productDescription }}</p>
+                <p class="text-sm">stocks: {{ list.productQuantity }}</p>
                 <div class="flex items-center justify-end gap-x-2 mt-2">
-                    <router-link :to="{ name: 'marketplaceMessage', params: { id: list.userId }, query: { item: list.id } }" class="group relative">
+                    <div class="mr-auto text-sm uppercase bg-green-500 px-2 rounded" :class="{ '!bg-red-500': list.status === 'sold' }">{{ list.status }}</div>
+                    <router-link v-if="list.userId !== currentUser.uid" :to="{ name: 'marketplaceMessage', params: { id: list.userId }, query: { item: list.id } }" class="group relative">
                         <Icon icon="mage:message" class="text-blue-500/70 text-xl cursor-pointer" />
                         <div class="absolute !w-14 top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
                           <p class="text-[.6rem] text-center">Inquire</p>
