@@ -36,13 +36,13 @@
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
                     <p class="line-clamp-3">{{ note.details }}</p>
                     <p v-if="note.category.length" class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
-                    <p v-if="note.tags.length" class="line-clamp-3 text-xs dark:text-gray-300 capitalize">
+                    <p v-if="note.tags?.length" class="line-clamp-3 text-xs dark:text-gray-300 capitalize">
                         Tags: 
                         <span v-for="(tag, index) in note.tags" :key="tag">
                             {{ tag }}<span v-if="index < note.tags.length - 1">, </span>
                         </span>
                     </p>
-                    <p v-if="note.notesImages.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages.length }} attachments</p>
+                    <p v-if="note.notesImages?.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages?.length }} attachments</p>
                 </div>
                 <!-- note footer -->
                 <div class="flex items-center justify-end gap-x-2 mt-2">
