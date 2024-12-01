@@ -1,8 +1,8 @@
 <template>
     <div class="space-y-5 content pb-10">
         <h1><span class="font-bold text-lg">Title:</span> {{ noteDetails.title }}</h1>
-        <h1><span class="font-bold text-lg">Details:</span> {{ noteDetails.details }}</h1>
         <h1><span class="font-bold text-lg">Date created:</span> {{ formatDate(noteDetails.addedAt) }}</h1>
+        <h1><span class="font-bold text-lg">Details:</span> {{ noteDetails.details }}</h1>
         <div v-if="noteDetails.notesImages?.length" class="grid grid-cols-2 gap-2" :class="{ 'grid-cols-1': noteDetails.notesImages.length === 1 }">
             <div  v-for="(img, index) in noteDetails.notesImages" :key="index" class="relative">
                 <img :src="img" @click="zoomImage(index)" class="w-full aspect-square object-cover rounded cursor-pointer" :class="{ 'hidden': index > 3, 'aspect-video': noteDetails.notesImages.length === 1 }">

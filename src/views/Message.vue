@@ -17,14 +17,24 @@
                 <div class="h-3 w-48 bg-gray-300 animate-pulse rounded-md"></div>
             </div>
         </div>
-        <div v-if="user" class="h-full flex flex-col-reverse py-5 gap-y-5">
-            <div v-for="message in messages" :key="message" class="w-fit space-y-1"  :class="{ 'self-end !bg-transparent': message.sendBy == currentUser?.uid }"> 
-                <div class="flex items-center">
+        <div v-if="user" class="h-full flex flex-col-reverse overflow-y-auto py-5 gap-y-5">
+            <div v-for="message in messages" :key="message" class="w-1/2 flex flex-col space-y-2"  :class="{ 'self-end !bg-transparent items-end': message.sendBy == currentUser?.uid }"> 
+                <div class="flex items-center" v-if="message.message">
                     <a :href="message.message" v-if="message.type === 'Share'" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded underline text-white"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
                     </a>
-                    <div v-else class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 text-white px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
+                    <div v-else class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 dark:text-white px-3 py-1 rounded"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
+                    </div>
+                </div>
+                <div class="grid w-full gap-1" :class="{ 'grid-cols-2': message.images.length > 1 }">
+                    <div v-for="image in message.images" :key="image" >
+                        <img :src="image" :alt="image" class="w-full aspect-square border dark:border-gray-100/10 rounded-md">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div v-for="file in message.files" :key="file" >
+                        <a :href="file" :download="getFileName(file)" target="_blank" class="px-2 py-1 rounded bg-gray-400/30 dark:bg-gray-300/10">{{ getFileName(file) }}</a>
                     </div>
                 </div>
                 <p class="text-[.6rem] capitalize">{{ formatDate(message.messageAt) }}</p>
@@ -37,18 +47,45 @@
             <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/3"></div>
             <div class="h-8 rounded-md bg-gray-300 animate-pulse w-1/2 self-end"></div>
         </div>
+        <div v-if="tempImagesURL.length || tempFilesNames.length" class="w-full h-20 mb-2 border dark:border-gray-100/10 rounded-xl flex gap-x-2 p-2 overflow-x-auto">
+            <div v-for="(image, index) in tempImagesURL" :key="index" class="relative group">
+                <img :src="image" alt="image" class="h-full aspect-square border rounded-md object-cover cursor-pointer">
+                <div class="absolute top-0 left-0 h-full aspect-square bg-black/25 rounded-md items-start justify-end p-1 hidden group-hover:flex">
+                    <Icon icon="mdi:close" class="text-white text-lg cursor-pointer" @click="removeImage(index)"/>
+                </div>
+            </div>
+            <div v-for="(fileName, index) in tempFilesNames" :key="index" class="relative w-fit p-2 group flex items-center border border-gray-100/10 rounded-md">
+                <div class="w-fit">{{ fileName }}</div>
+                <div class="absolute top-0 left-0 h-full w-full bg-black/25 rounded-md items-start justify-end p-1 hidden group-hover:flex">
+                    <Icon icon="mdi:close" class="text-white text-lg cursor-pointer" @click="removeFiles(index)"/>
+                </div>
+            </div>
+        </div>
         <form @submit.prevent="sendMessage(user?.userId)" class="h-14 w-full mb-5 flex gap-x-2">
-            <div class="flex items-center h-full">
-                <label for="imageUpload" class="bg-gray-100/10 h-full aspect-square flex items-center justify-center rounded cursor-pointer">
-                    <Icon icon="mdi:image" class="text-4xl" />
-                </label>
-                <input
-                    type="file"
-                    id="imageUpload"
-                    class="hidden"
-                    accept="image/*"
-                    @change="onFileChange"
-                />
+            <div class="flex items-center h-full relative">
+                <div class="bg-gray-400/30 dark:bg-gray-100/10 h-full aspect-square flex items-center justify-center rounded cursor-pointer" @click="addAttachment = !addAttachment">
+                    <Icon icon="et:attachments" class="text-xl" />
+                </div>
+                <div v-if="addAttachment" class="bg-red -top-[110%] left-0 h-fit w-fit border border-gray-100/10 bg-gray-200 dark:bg-neutral-800 absolute rounded-md p-1 flex items-center">
+                    <label for="imageUpload" class="cursor-pointer"><Icon icon="mdi:image" class="text-gray-500 text-4xl" /></label>
+                    <input
+                        type="file"
+                        id="imageUpload"
+                        class="hidden"
+                        accept=".jpg, .jpeg, .png"
+                        multiple
+                        @change="onImageChange"
+                    />
+                    <label for="fileUpload" class="cursor-pointer"><Icon icon="solar:file-bold" class="text-4xl text-gray-500"/></label>
+                    <input
+                        type="file"
+                        id="fileUpload"
+                        class="hidden"
+                        accept=".pdf, .docx, .docs, .csv"
+                        multiple
+                        @change="onFileChange"
+                    />
+                </div>
             </div>
             <input
                 v-model="message"
@@ -106,49 +143,96 @@ const getUser = async () => {
   })
 }
 
+const addAttachment = ref(false)
+
 const message = ref('')
 
-const selectedFile = ref(null)
+const selectedImages = ref([])
+const tempImagesURL = ref([])
+
+const onImageChange = (event) => {
+    const files = event.target.files
+    if (files.length) {
+        for(const file of files){
+            const url = URL.createObjectURL(file)
+            tempImagesURL.value.push(url)
+            selectedImages.value.push(file)
+        }
+    }
+
+    addAttachment.value = false
+}
+
+const removeImage = (index) => {
+    selectedImages.value.splice(index, 1)
+    tempImagesURL.value.splice(index, 1)
+}
+
+const selectedFiles = ref([])
+const tempFilesNames = ref([])
 
 const onFileChange = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-        selectedFile.value = file
-        uploadImage()
+    const files = event.target.files
+    if (files.length) {
+        for(const file of files){
+            tempFilesNames.value.push(file.name)
+            selectedFiles.value.push(file)
+        }
     }
+
+    addAttachment.value = false
 }
 
-const uploadImage = async () => {
-    if (!selectedFile.value) return
-
-    const storage = getStorage()
-    const fileRef = storageRef(storage, `chatImages/${selectedFile.value.name}`)
-
-    try {
-        await uploadBytes(fileRef, selectedFile.value)
-        const downloadURL = await getDownloadURL(fileRef)
-        sendMessage(user.value.userId, downloadURL, "image")
-        selectedFile.value = null
-    } catch (error) {
-        console.error("Error uploading image:", error)
-    }
+const removeFiles = (index) => {
+    selectedFiles.value.splice(index, 1)
+    tempFilesNames.value.splice(index, 1)
 }
 
-const sendMessage = async (receiverID, content = message.value, messageType = "text") => {
-    if (!content) return
+const sendMessage = async (receiverID) => {
+    message.value = ""
+    selectedImages.value = []
+    tempImagesURL.value = []
+    selectedFiles.value = []
+    tempFilesNames.value = []
 
+    addAttachment.value = false
     try {
+        let images = []
+        let files = []
+
+        if(selectedImages.value.length){
+            for(const image of selectedImages.value){
+                const storage = getStorage()
+                const fileRef = storageRef(storage, `chatImages/${image.name}`)
+                await uploadBytes(fileRef, image)
+                const downloadURL = await getDownloadURL(fileRef)
+
+                images.push(downloadURL)
+            }
+        }
+
+        if(selectedFiles.value.length){
+            for(const file of selectedFiles.value){
+                const storage = getStorage()
+                const fileRef = storageRef(storage, `chatFiles/${file.name}`)
+                await uploadBytes(fileRef, file)
+                const downloadURL = await getDownloadURL(fileRef)
+
+                files.push(downloadURL)
+            }
+        }
+
         await addDoc(collection(db, "messages"), {
             sendBy: currentUser.value?.uid,
             receiveBy: receiverID,
-            message: content,
+            message: message.value,
+            images: images,
+            files: files,
             messageAt: Timestamp.now(),
             isRead: false,
             isView: false,
             type: 'personal',
-            messageType,
         })
-        message.value = ""
     } catch (error) {
         console.error("Error sending message:", error)
     }
@@ -208,6 +292,11 @@ const getMessages = () => {
     }
 }
 
+const getFileName = (fileUrl) => {
+    const decodedUrl = decodeURIComponent(fileUrl);
+    return decodedUrl.split("/").pop().split("?")[0];
+}
+
 const viewAllMessages = async () => {
     try {
         const q1 = query(
@@ -249,12 +338,16 @@ const viewAllMessages = async () => {
 
 onMounted(() => {
     getUser()
-    viewAllMessages()
+    watch(messages.value, () => {
+        viewAllMessages()
+    })
 })
 
 </script>
 
 
 <style scoped>
-
+.flex-col-reverse::-webkit-scrollbar {
+    display: none;
+}
 </style>

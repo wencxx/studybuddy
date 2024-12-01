@@ -78,6 +78,9 @@
                         <router-link :to="{ name: 'selling' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Sell a product</span>
                         </router-link>
+                        <router-link :to="{ name: 'sellings' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Sellings</span>
+                        </router-link>
                         <router-link :to="{ name: 'listings' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Listings</span>
                         </router-link>

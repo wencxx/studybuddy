@@ -148,9 +148,14 @@ const routes = [
         },
         children: [
             {
-                path: 'selling',
+                path: 'sell',
                 name: 'selling',
                 component: () => import('../views/child/sellProduct.vue')
+            },
+            {
+                path: 'sellings',
+                name: 'sellings',
+                component: () => import('../views/child/myProducts.vue')
             },
             {
                 path: 'listings',
