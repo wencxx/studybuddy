@@ -209,9 +209,7 @@ const quizRef = collection(db, 'quizzes')
 const getQuizzes = async () => {
     const q = query(
         quizRef,
-        and(
-            where('sharedTo', 'array-contains', currentUser.value.uid),
-        )
+        where('privacy', '==', 'General')
     )
     try {
         const snapshot = await getDocs(q)

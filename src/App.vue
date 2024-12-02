@@ -50,7 +50,7 @@
                 <li>
                     <router-link :to="{ name: 'quiz' }" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'sharedQuiz' }">
                         <Icon icon="mingcute:task-2-fill" class="text-3xl" />
-                        <span class="text-xl">Quiz</span>
+                        <span class="text-xl">Tasks</span>
                     </router-link>
                 </li>
                 <li>
@@ -78,7 +78,7 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'topStudents' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'topStudents' }">
+                    <router-link  :to="{ name: 'topStudents' }" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'topStudents' }">
                         <Icon icon="solar:ranking-linear" class="text-2xl"/>
                         <span class="text-xl">Top Users</span>
                     </router-link>
@@ -129,6 +129,21 @@
               <p class="text-[.6rem]">Notifications</p>
             </div>
           </button>
+          <div v-if="authStore.isAuthenticated && currentUser" class="flex hover:bg-gray-100 hover:dark:bg-gray-800/50 p-1 rounded relative group">
+            <router-link :to="{ name: 'userDetails', params: { id: currentUser?.uid } }" class="!bg-transparent" v-if="currentUser && currentUser.photoURL">
+              <img
+                  :src="currentUser.photoURL"
+                  alt="profile pic"
+                  class="rounded-full w-6 aspect-square"
+              />
+            </router-link>
+            <router-link v-else :to="{ name: 'userDetails', params: { id: currentUser?.uid } }" class="!bg-transparent">
+              <Icon icon="mdi:user" class="text-gray-400 dark:text-white text-2xl border rounded-full p-1" />
+            </router-link>
+            <div class="absolute top-full mt-1 right-1/4 md:right-1/2 md:translate-x-1/2 w-[300%] border dark:border-gray-100/10 py-1 rounded-md hidden group-hover:block">
+              <p class="text-[.6rem] text-center">Profile</p>
+            </div>
+          </div>
           <Icon :icon="iconType" class="text-3xl text-gray-900 dark:text-white cursor-pointer" :class="{ 'hidden': !authStore.isAuthenticated  }" @click="toggleSidebar" />
         </div>
         <!-- profile -->
@@ -186,6 +201,33 @@
         <sideBar v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
         <router-view :searchQuery="searchQuery" :collaborated="collaborated" :userId="currentUser?.uid" class="min-h-[93dvh] w-full lg:w-2/4 overflow-auto -mt-[10dvh] pt-[12dvh] pr-5" />
         <rightSideBar @collabs="getCollabs" :userId="currentUser?.uid" v-if="$route.path != '/' && $route.path != '/register' && $route.name !== 'userDetails'" class="h-full w-1/4 hidden lg:block" />
+        <div v-if="authStore.isAuthenticated" class="w-0 flex flex-col bg-gray-900 h-[94dvh] lg:hidden absolute top-[6dvh] right-0 z-20 border-l border-gray-100/10" :class="{ 'w-3/4': toggleSidebarCollabs }">
+            <div class="absolute top-1/2 -translate-y-1/2 -left-6">
+              <Icon v-if="!toggleSidebarCollabs" icon="ep:arrow-left-bold" class="text-2xl" @click="toggleSidebarCollabs = true" />
+              <Icon v-else icon="ep:arrow-right-bold" class="text-2xl" @click="toggleSidebarCollabs = false" />
+            </div>
+            <div v-if="toggleSidebarCollabs" class="border-l border-gray-200 dark:border-gray-100/10 w-11/12 h-full pl-3 pt-5">
+              <h1>Collaborated</h1>
+              <div >
+                <div v-if="collaborated.length > 0" class="flex flex-col gap-y-3 mt-5">
+                    <router-link :to="{ name: 'userDetails', params: { id:user.userId } }" v-for="user in collaborated" :key="user.id" class="flex items-center gap-x-3">
+                        <div v-if="user.photoURL" class="w-10 rounded-full aspect-square overflow-hidden">
+                            <img :src="user.photoURL" alt="profile pic" class="w-full aspect-square">
+                        </div>
+                        <div v-else class="w-10 rounded-full aspect-square overflow-hidden flex items-center justify-center border">
+                            <Icon icon="mdi:user" class="text-3xl" />
+                        </div>
+                        <div>
+                            <h1>{{ user.displayName }}</h1>
+                        </div>
+                    </router-link>
+                </div>
+                <div v-else class="mt-5">
+                    <p class="text-sm">Start collaborating now</p>
+                </div>
+              </div>
+          </div>
+        </div>
       </div>
   </div>
 </template>
@@ -198,6 +240,8 @@ import { useAuthStore, useDataStore } from './store'
 import { useRouter, useRoute } from 'vue-router'
 import { db } from './plugins/firebase'
 import { addDoc, collection, doc, getDocs, query, where, onSnapshot, limit, orderBy } from 'firebase/firestore'
+
+const toggleSidebarCollabs = ref(false)
 
 // components import
 import sideBar from './components/sideBar.vue'
@@ -385,6 +429,7 @@ const searchByClicking = () => {
       }
   })
 }
+
 </script>
 
 <style scoped>

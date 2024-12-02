@@ -37,6 +37,9 @@
                 <span>oogle</span>
             </button> -->
         </form>
+        <div class="absolute bottom-5 flex justify-center w-full">
+            <p class="text-center w-2/3 text-sm">Please send an email to <a href="mailto:studybuddynotetaking@gmail.com" class="text-blue-500">studybuddynotetaking@gmail.com</a> for your StudyBuddy account.</p>
+        </div>
     </div>
 </template>
 

@@ -104,6 +104,14 @@ const routes = [
         component: () => import('../views/TakeQuiz.vue')
     },
     {
+        path: '/general-quiz',
+        name: 'generalQuiz',
+        component: () => import('../views/GeneralQuiz.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/notes',
         name: 'notes',
         component: () => import('../views/Notes.vue'),

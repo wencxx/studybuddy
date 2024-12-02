@@ -41,7 +41,7 @@
                     </div>
                     <!-- post body -->
                     <div>
-                        <p class="line-clamp-4">{{ post.postDetails }}</p>
+                        <p class="line-clamp-4" v-html="formatPostContent(post.postDetails)"></p>
                     </div>
                     <!-- attachments -->
                     <div v-if="post.postAttachments && post.postAttachments?.length" class="flex">
@@ -310,6 +310,14 @@ const removeReact = async (postId) => {
 }
 
 getPosts()
+
+const formatPostContent = (content) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    return content.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" class="text-blue-500 hover:underline">${url}</a>`;
+    });
+}
 
 onMounted(() => {
     watch(posts, () => {

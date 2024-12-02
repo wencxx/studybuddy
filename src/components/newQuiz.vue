@@ -17,11 +17,18 @@
                 <label>Due date</label>
                 <input type="datetime-local" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Due date" v-model="dueDate" @change="checkDueDate">
             </div>
-      </div>
+      </div>    
       <div class="flex gap-x-2">
             <div class="flex flex-col w-1/2 gap-y-2">
                 <label>Timer</label>
                 <input type="number" step="1" class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8" placeholder="Minutes" v-model="quizTimer">
+            </div>
+            <div class="flex flex-col w-1/2 gap-y-2">
+                <label>Privacy</label>
+                <select class="border dark:border-gray/100 rounded bg-transparent pl-2 h-8 text-white" v-model="privacy">
+                    <option class="text-black">Private</option>
+                    <option class="text-black">General</option>
+                </select>
             </div>
       </div>
       <div class="flex flex-col items-end gap-y-4">
@@ -144,6 +151,7 @@ const quizTitle = ref('')
 const dueDate = ref('')
 const quizAddedType = ref('')
 const quizTimer = ref('')
+const privacy = ref('')
 const question = ref('')
 const choices = ref([])
 const answer = ref('')
@@ -213,6 +221,7 @@ const submitQuiz = async () => {
         const snapshot = await addDoc(quizRef, {
             quizTitle: quizTitle.value,
             quizTimer: quizTimer.value,
+            privacy: privacy.value,
             dueDate: dueDate.value,
             quizzes: quizzes.value,
             status: 'To do',
