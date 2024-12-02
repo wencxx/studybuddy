@@ -20,7 +20,7 @@
             </select>
         </div>
         <!-- notes -->
-        <div v-if="filteredNotes().length > 0" class="grid md:grid-cols-2 gap-5">
+        <div v-if="filteredNotes()?.length > 0" class="grid md:grid-cols-2 gap-5">
             <div v-for="(note, index) in filteredNotes()" :key="index" class="h-full border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col justify-between gap-y-3">
                 <!-- note header -->
                 <div class="flex items-center justify-between">
@@ -35,11 +35,11 @@
                 <div class="flex flex-col gap-y-2">
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
                     <p class="line-clamp-3">{{ note.details }}</p>
-                    <p v-if="note.category.length" class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
+                    <p v-if="note.category?.length" class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
                     <p v-if="note.tags?.length" class="line-clamp-3 text-xs dark:text-gray-300 capitalize">
                         Tags: 
                         <span v-for="(tag, index) in note.tags" :key="tag">
-                            {{ tag }}<span v-if="index < note.tags.length - 1">, </span>
+                            {{ tag }}<span v-if="index < note.tags?.length - 1">, </span>
                         </span>
                     </p>
                     <p class="line-clamp-4 text-gray-300/85 text-xs">Note Ratings: {{ overAllRatings(note.ratings) || 0 }}</p>

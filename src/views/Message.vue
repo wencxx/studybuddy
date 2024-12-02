@@ -18,7 +18,7 @@
             </div>
         </div>
         <div v-if="user" class="h-full flex flex-col-reverse overflow-y-auto py-5 gap-y-5">
-            <div v-for="message in messages" :key="message" class="w-1/2 flex flex-col space-y-2"  :class="{ 'self-end !bg-transparent items-end': message.sendBy == currentUser?.uid }"> 
+            <div v-for="message in messages" :key="message" class="w-1/2 flex flex-col"  :class="{ 'self-end !bg-transparent items-end': message.sendBy == currentUser?.uid }"> 
                 <div class="flex items-center" v-if="message.message">
                     <a :href="message.message" v-if="message.type === 'Share'" class="border border-gray-300 dark:border-gray-100/10 bg-blue-500 px-3 py-1 rounded underline text-white"  :class="{ '!bg-transparent': message.sendBy == currentUser?.uid }">
                         {{ message.message }}
@@ -34,7 +34,9 @@
                 </div>
                 <div class="space-y-2">
                     <div v-for="file in message.files" :key="file" >
-                        <a :href="file" :download="getFileName(file)" target="_blank" class="px-2 py-1 rounded bg-gray-400/30 dark:bg-gray-300/10">{{ getFileName(file) }}</a>
+                        <div  class="px-2 py-1 rounded bg-gray-400/30 dark:bg-gray-300/10">
+                            <a :href="file" :download="getFileName(file)" target="_blank">{{ getFileName(file) }}</a>
+                        </div>
                     </div>
                 </div>
                 <p class="text-[.6rem] capitalize">{{ formatDate(message.messageAt) }}</p>
@@ -194,12 +196,6 @@ const removeFiles = (index) => {
 }
 
 const sendMessage = async (receiverID) => {
-    message.value = ""
-    selectedImages.value = []
-    tempImagesURL.value = []
-    selectedFiles.value = []
-    tempFilesNames.value = []
-
     addAttachment.value = false
     try {
         let images = []
@@ -227,6 +223,11 @@ const sendMessage = async (receiverID) => {
             }
         }
 
+        selectedImages.value = []
+        tempImagesURL.value = []
+        selectedFiles.value = []
+        tempFilesNames.value = []   
+
         await addDoc(collection(db, "messages"), {
             sendBy: currentUser.value?.uid,
             receiveBy: receiverID,
@@ -238,6 +239,8 @@ const sendMessage = async (receiverID) => {
             isView: false,
             type: 'personal',
         })
+
+        message.value = ""
     } catch (error) {
         console.error("Error sending message:", error)
     }
