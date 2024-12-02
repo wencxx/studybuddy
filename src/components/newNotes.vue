@@ -39,10 +39,21 @@
               </div>
             </div>
         </div>
+        <div class="flex flex-wrap gap-2">
+          <div v-for="file in fileNames" :key="file" class="bg-neutral-800 px-3 py-1 rounded">
+              <p>{{ file }}</p>
+          </div>
+        </div>
         <!-- add media -->
-        <div class="flex">
-          <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addImage" />
-          <input @change="handleImageUpload" type="file" class="hidden" accept=".jpg, .png, .jpeg" id="imageInput" multiple>
+        <div class="flex gap-x-1">
+          <div class="flex">
+            <Icon icon="material-symbols:imagesmode-outline" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addImage" />
+            <input @change="handleImageUpload" type="file" class="hidden" accept=".jpg, .png, .jpeg" id="imageInput" multiple>
+          </div>
+          <div class="flex">
+            <Icon icon="bxs:file-pdf" class="dark:text-gray-100/55 text-3xl cursor-pointer hover:text-gray-600 hover:dark:text-gray-100/75" @click="addFile" />
+            <input @change="handlePDFUpload" type="file" class="hidden" accept=".pdf, .docx, .docs" id="pdfInput" multiple>
+          </div>
         </div>
         <!-- buttons -->
         <div>
@@ -96,6 +107,28 @@ const removeImageToPost = (img) => {
   }
 }
 
+// pdf to post
+const files = ref([])  
+const fileNames = ref([])
+
+// handle image to post
+const handlePDFUpload = (event) => {
+  Array.from(event.target.files).forEach(file => {
+    fileNames.value.push(file.name);
+    files.value.push(file);
+  });
+}
+
+// remove image to post
+const removeFileToPost = (img) => {
+  const index = files.value.indexOf(img)
+
+  if (index !== -1) {
+    fileNames.value.splice(index, 1)
+    files.value.splice(index, 1)
+  }
+}
+
 // add tag
 const tag = ref('')
 
@@ -117,14 +150,24 @@ const adding = ref(false)
 
 const post = async () => {
     const imageUrls = []
+    const pdfUrls = []
     try {
       adding.value = true
       if(images.value.length > 0){
         for(const image of images.value){
-          const imageRef =  storageRef(storage, `posts/${image.name}`)
+          const imageRef =  storageRef(storage, `notesImages/${image.name}`)
           await uploadBytes(imageRef, image)
           const  imageLink = await getDownloadURL(imageRef)
           imageUrls.push(imageLink)
+        }
+      }
+
+      if(files.value.length){
+        for(const file of files.value){
+          const fileRef =  storageRef(storage, `notesFiles/${file.name}`)
+          await uploadBytes(fileRef, file)
+          const  fileLink = await getDownloadURL(fileRef)
+          pdfUrls.push(fileLink)
         }
       }
 
@@ -138,6 +181,7 @@ const post = async () => {
         addedAt: Timestamp.now(),
         userId: currentUser.value.uid,
         notesImages: imageUrls,
+        notesFiles: pdfUrls,
       });
 
 
@@ -155,6 +199,11 @@ const post = async () => {
 const addImage = () => {
   const imageInput = document.getElementById('imageInput')
   imageInput.click()
+}
+
+const addFile = () => {
+  const pdfInput = document.getElementById('pdfInput')
+  pdfInput.click()
 }
 </script>
 

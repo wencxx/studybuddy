@@ -36,6 +36,7 @@
                     <h1 class="uppercase font-semibold line-clamp-1">{{ note.title }}</h1>
                     <p class="line-clamp-3 text-sm">{{ note.details }}</p>
                     <p class="line-clamp-3 text-xs dark:text-gray-300">Category: {{ note.category }}</p>
+                    <p class="line-clamp-4 text-gray-300/85 text-xs">Note Ratings: {{ overAllRatings(note.ratings) || 0 }}</p>
                     <p v-if="note.notesImages.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages.length }} attachments</p>
                 </div>
                 <!-- note footer -->
@@ -208,6 +209,18 @@ const deleteNote = async (noteID, index) => {
     } catch (error) {
         console.log(error)
     }
+}
+
+const overAllRatings = (ratings) => {
+    const overallRatings = ratings?.reduce((acc, rating) => {
+        acc += rating.rating
+
+        return acc
+    }, 0)
+
+    const average = overallRatings / ratings?.length
+
+    return average
 }
 </script>
 

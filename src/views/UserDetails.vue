@@ -13,7 +13,12 @@
                 </div>
             </div>
             <div>
-                <h2 class="text-2xl">{{ user.displayName }}</h2>
+                <h2 class="text-2xl flex items-center gap-x-2 capitalize">
+                    {{ user.displayName }} 
+                    <span>
+                        <Icon v-if="getRanking()" :icon="`tabler:rosette-number-${getRanking()}`" class="text-2xl bg-blue-500 rounded-full" />
+                    </span>
+                </h2>
                 <p class="text-sm">{{ user.email }}</p>
             </div>
             <div  v-if="user.userId === currentUser.uid" class="absolute right-0 top-3 flex flex-col items-end">
@@ -26,7 +31,7 @@
         <div>
             <p class="text-sm dark:text-gray-100/55">Course: {{ user.course }}</p>
             <p class="text-sm dark:text-gray-100/55">Year & Section: {{ user.yearSection }}</p>
-            <p class="text-sm dark:text-gray-100/55">Ratings: {{ overAllRatings() || 0 }}</p>
+            <p class="text-sm dark:text-gray-100/55">Ratings: {{ overAllRatings().toFixed(1) || 0 }}</p>
             <div class="flex gap-x-2 mt-2" v-if="currentUser.uid !== $route.params.id">
                 <p class="text-sm dark:text-gray-100/55">Rate:</p>
                 <Icon
@@ -197,19 +202,28 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { collection, query, where, getDocs, onSnapshot, limit, updateDoc, arrayUnion, arrayRemove, doc, orderBy, getCountFromServer, addDoc, Timestamp, and, getDoc } from 'firebase/firestore';
 import { db, storage, auth } from '../plugins/firebase'; 
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '../store'
+import { useAuthStore, useDataStore } from '../store'
 import { indexedDBLocalPersistence, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 const toggledProfileMenu = ref(false)
 
 const authStore = useAuthStore()
+const dataStore = useDataStore()
 
 const isCollaborated = computed(() => authStore.isCollaborated)
 const currentUser = computed(() => authStore.currentUser)
+const topRated = computed(() => dataStore.topRatedUsers)
 
 const route = useRoute()
 const router = useRouter()
+
+const getRanking = () => {
+    const user = topRated?.value.find(user => user.userId === route.params.id)
+    const ranking = topRated?.value.indexOf(user)
+
+    return ranking + 1
+}
 
 const user = ref(null);
 
@@ -702,6 +716,7 @@ onMounted(() => {
         getUser();
         getUserPosts()
     })
+    dataStore.getStudents()
 });
 </script>
 

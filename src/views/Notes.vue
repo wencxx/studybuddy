@@ -42,6 +42,7 @@
                             {{ tag }}<span v-if="index < note.tags.length - 1">, </span>
                         </span>
                     </p>
+                    <p class="line-clamp-4 text-gray-300/85 text-xs">Note Ratings: {{ overAllRatings(note.ratings) || 0 }}</p>
                     <p v-if="note.notesImages?.length" class="line-clamp-4 text-gray-300/85 text-xs">{{ note.notesImages?.length }} attachments</p>
                 </div>
                 <!-- note footer -->
@@ -244,6 +245,18 @@ const editNote = (note) => {
     noteToEdit.value = note
 
     editNoteModal.value = true
+}
+
+const overAllRatings = (ratings) => {
+    const overallRatings = ratings?.reduce((acc, rating) => {
+        acc += rating.rating
+
+        return acc
+    }, 0)
+
+    const average = overallRatings / ratings?.length
+
+    return average
 }
 </script>
 

@@ -140,6 +140,11 @@ const routes = [
         component: () => import('../views/Feedback.vue')
     },
     {
+        path: '/top-students',
+        name: 'topStudents',
+        component: () => import('../views/TopStudents.vue')
+    },
+    {
         path: '/marketplace',
         name: 'marketplace',
         component: () => import('../views/MarketPlace.vue'),

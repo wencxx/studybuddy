@@ -1,8 +1,23 @@
 <template>
     <div class="space-y-5 content pb-10">
-        <h1><span class="font-bold text-lg">Title:</span> {{ noteDetails.title }}</h1>
+        <h1><span class="font-bold text-lg">Title:</span> <span class="capitalize">{{ noteDetails.title }}</span></h1>
         <h1><span class="font-bold text-lg">Date created:</span> {{ formatDate(noteDetails.addedAt) }}</h1>
-        <h1><span class="font-bold text-lg">Details:</span> {{ noteDetails.details }}</h1>
+        <h1><span class="font-bold text-lg">Details: </span><span class="capitalize" v-html="formatNotesDetails(noteDetails.details)"></span></h1>
+        <div class="flex gap-x-2 mt-2" v-if="currentUser?.uid !== noteDetails?.userId">
+            <p class="text-sm dark:text-gray-100/55">Rate:</p>
+            <Icon
+                v-for="star in 5"
+                :icon="star <= getCurrentUserRating() ? 'iconoir:star-solid' : 'iconoir:star'"
+                :key="'q1-star-' + star"
+                :class="['text-lg cursor-pointer', star <= getCurrentUserRating() ? 'text-yellow-500' : 'dark:text-white']"
+                @click="rate(star)"
+            />
+        </div>
+        <div v-if="noteDetails.notesFiles?.length" class="flex flex-wrap gap-2">
+            <div v-for="file in noteDetails.notesFiles" :key="file">
+                <a :href="file" class="bg-gray-100/25 px-3 py-1 rounded">{{ getFileName(file) }}</a>
+            </div>
+        </div>
         <div v-if="noteDetails.notesImages?.length" class="grid grid-cols-2 gap-2" :class="{ 'grid-cols-1': noteDetails.notesImages.length === 1 }">
             <div  v-for="(img, index) in noteDetails.notesImages" :key="index" class="relative">
                 <img :src="img" @click="zoomImage(index)" class="w-full aspect-square object-cover rounded cursor-pointer" :class="{ 'hidden': index > 3, 'aspect-video': noteDetails.notesImages.length === 1 }">
@@ -30,10 +45,14 @@
 
 <script setup>
 import { db } from '../plugins/firebase'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 import { useRoute } from 'vue-router' 
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import moment from 'moment' 
+import { useAuthStore } from '../store'
+
+const authStore = useAuthStore()
+const currentUser = computed(() => authStore.currentUser)
 
 const route = useRoute()
 
@@ -43,12 +62,16 @@ const noteDetails = ref({})
 
 const getDocs = async () => {
     try {
-        const snapshot = await getDoc(noteRef)
-
-        noteDetails.value = {
-            id: snapshot.id,
-            ...snapshot.data()
-        }
+        onSnapshot(
+            noteRef,
+            (snapshot) => {
+                noteDetails.value = {
+                    id: snapshot.id,
+                    ...snapshot.data()
+                }
+            }
+        )
+        // const snapshot = await getDoc(noteRef)
     } catch (error) {
         console.log(error)
     }
@@ -86,6 +109,56 @@ const formatDate = (date) => {
     return moment(convertedDate).format('lll');
 };
 
+const formatNotesDetails = (content) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    return content?.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" class="text-blue-500 hover:underline">${url}</a>`;
+    });
+}
+
+const getFileName = (fileUrl) => {
+    const decodedUrl = decodeURIComponent(fileUrl);
+    return decodedUrl.split("/").pop().split("?")[0];
+}
+
+// get ratings
+const ratings = ref(0)
+const rate = async (rate) => {
+    if (!currentUser.value?.uid) {
+        console.log("User not logged in");
+        return;
+    }
+
+    try {
+        const docRef = doc(db, 'notes', route.params.id);
+
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+            const userData = snapshot.data();
+            const updatedRatings = (userData.ratings || []).filter(r => r.id !== currentUser.value.uid);
+
+            updatedRatings.push({
+                id: currentUser.value.uid,
+                rating: rate
+            });
+
+            await updateDoc(docRef, { ratings: updatedRatings });
+        } else {
+            console.log("User not found in the database");
+        }
+    } catch (error) {
+        console.error("Error updating ratings:", error);
+    }
+};
+
+// filter ratings
+const getCurrentUserRating = () => {
+    const currenrUserRating = noteDetails.value?.ratings?.find(rating => rating.id === currentUser.value?.uid)
+
+
+    return currenrUserRating?.rating
+}
 
 onMounted(() => {
     getDocs()

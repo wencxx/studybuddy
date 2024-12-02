@@ -18,25 +18,25 @@
                     </router-link>
                 </li>
                 <li>
-                    <div @click="toggleGroups = !toggleGroups" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
+                    <div @click="toggleGroups = !toggleGroups" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white">
                         <Icon icon="fluent-mdl2:publish-course" class="text-2xl" />
                         <span class="text-xl">Courses</span>
                         <Icon icon="weui:arrow-outlined" class="text-2xl ml-auto duration-150" :class="{ 'rotate-90': toggleGroups }" />
                     </div>
                     <div v-if="toggleGroups" class="flex flex-col gap-y-1 pl-10 mt-3">
-                        <router-link :to="{ name: 'ITNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                        <router-link :to="{ name: 'ITNewsfeed' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Information Technology</span>
                         </router-link>
-                        <router-link :to="{ name: 'ISNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                        <router-link :to="{ name: 'ISNewsfeed' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Information Systems</span>
                         </router-link>
-                        <router-link :to="{ name: 'INDUSNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                        <router-link :to="{ name: 'INDUSNewsfeed' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Industrial Technology</span>
                         </router-link>
-                        <router-link :to="{ name: 'EDUCNewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                        <router-link :to="{ name: 'EDUCNewsfeed' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Technical Teacher Education</span>
                         </router-link>
-                        <router-link :to="{ name: 'CENewsfeed' }" class="flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                        <router-link :to="{ name: 'CENewsfeed' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Computer Engineering</span>
                         </router-link>
                     </div>
@@ -60,21 +60,27 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'calendar' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'calendar' }">
+                    <router-link  :to="{ name: 'calendar' }" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'calendar' }">
                         <Icon icon="tabler:calendar" class="text-2xl"/>
                         <span class="text-xl">Calendar</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'rate' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'rate' }">
+                    <router-link  :to="{ name: 'rate' }" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'rate' }">
                         <Icon icon="iconoir:star" class="text-2xl"/>
                         <span class="text-xl">Rate Us</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link  :to="{ name: 'feedback' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'feedback' }">
+                    <router-link  :to="{ name: 'feedback' }" class="text-white flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'feedback' }">
                         <Icon icon="mdi:feedback-outline" class="text-2xl"/>
                         <span class="text-xl">Feedback</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link  :to="{ name: 'topStudents' }" class="flex items-center gap-x-4 p-1 rounded-md hover:bg-blue-600 hover:text-white" :class="{ 'bg-[#2563eb] text-white': $route.name === 'topStudents' }">
+                        <Icon icon="solar:ranking-linear" class="text-2xl"/>
+                        <span class="text-xl">Top Users</span>
                     </router-link>
                 </li>
                 <li>
@@ -86,6 +92,9 @@
                     <div v-if="toggledMarketplace" class="flex flex-col gap-y-1 pl-10 mt-3">
                         <router-link :to="{ name: 'selling' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Sell a product</span>
+                        </router-link>
+                        <router-link :to="{ name: 'sellings' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
+                            <span>Sellings</span>
                         </router-link>
                         <router-link :to="{ name: 'listings' }" class="text-white flex items-center gap-x-4 p-1 pl-2 rounded-md hover:bg-blue-600 hover:text-white">
                             <span>Listings</span>
