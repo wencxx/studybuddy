@@ -3,17 +3,19 @@
         <div>
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Task</button>
         </div>
-        <div class="flex overflow-hidden">
-            <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/5 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">My Tasks</router-link>
-            <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center w-1/5 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
-            <router-link :to="{ name: 'generalQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'generalQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/5 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">General Tasks</router-link>
-            <select class="ml-auto bg-transparent text-black dark:text-white border px-3 rounded focus:outline-none" v-model="filterQuery">
+        <div class="flex gap-y-3 flex-col lg:flex-row w-full h-fit py-1 z-20">
+            <div class="flex w-full">
+                <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/3 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">My Tasks</router-link>
+                <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center w-1/3 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
+                <router-link :to="{ name: 'generalQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'generalQuiz' }" class="border border-[#2563eb] text-center rounded-tr rounded-br w-1/3 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">General Tasks</router-link>
+            </div>
+            <select class="ml-auto bg-transparent text-black dark:text-white border px-3 h-1/2 lg:h-full rounded focus:outline-none" v-model="filterQuery">
                 <option class="dark:text-black" value="">All tasks</option>
                 <option class="dark:text-black" value="To do">To do</option>
                 <option class="dark:text-black" value="Completed">Completed</option>
             </select>
         </div>
-        <div v-if="filteredQuizzes().length > 0" class="h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div v-if="filteredQuizzes().length > 0" class="h-full overflow-y-auto mb-5 grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             <div v-for="(quiz, index) in filteredQuizzes()" :key="index" class="h-fit border p-3 border-gray-300 dark:border-gray-100/10 border-b-4 !border-b-blue-500 rounded-md flex flex-col gap-y-3">
                 <!-- quiz header -->
                 <div class="flex items-center justify-between">
