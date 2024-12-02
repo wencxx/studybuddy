@@ -3,7 +3,7 @@
         <div>
             <button class="float-end bg-blue-500 w-1/5 lg:w-2/6 xl:w-1/5 py-1 rounded !text-white hover:bg-blue-700" @click="addNewQuiz = true">Add Task</button>
         </div>
-        <div class="flex gap-y-3 flex-col lg:flex-row w-full h-fit py-1 z-20">
+        <div class="flex gap-y-3 flex-col lg:flex-row w-full h-fit py-1">
             <div class="flex w-full">
                 <router-link :to="{ name: 'quiz' }" :class="{ 'bg-[#2563eb]': $route.name === 'quiz' }" class="border border-[#2563eb] text-center rounded-tl rounded-bl w-1/3 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">My Tasks</router-link>
                 <router-link :to="{ name: 'sharedQuiz' }" :class="{ 'bg-[#2563eb] !text-white': $route.name === 'sharedQuiz' }" class="border border-[#2563eb] text-center w-1/3 lg:w-2/6 xl:w-1/5 py-1 text-black dark:text-white hover:bg-[#2563eb]">Shared Tasks</router-link>
