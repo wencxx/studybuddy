@@ -194,12 +194,6 @@ const removeFiles = (index) => {
 }
 
 const sendMessage = async (receiverID) => {
-    message.value = ""
-    selectedImages.value = []
-    tempImagesURL.value = []
-    selectedFiles.value = []
-    tempFilesNames.value = []
-
     addAttachment.value = false
     try {
         let images = []
@@ -227,6 +221,11 @@ const sendMessage = async (receiverID) => {
             }
         }
 
+        selectedImages.value = []
+        tempImagesURL.value = []
+        selectedFiles.value = []
+        tempFilesNames.value = []   
+
         await addDoc(collection(db, "messages"), {
             sendBy: currentUser.value?.uid,
             receiveBy: receiverID,
@@ -238,6 +237,8 @@ const sendMessage = async (receiverID) => {
             isView: false,
             type: 'personal',
         })
+
+        message.value = ""
     } catch (error) {
         console.error("Error sending message:", error)
     }
