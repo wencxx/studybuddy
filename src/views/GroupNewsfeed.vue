@@ -72,12 +72,12 @@
                             <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(post.id)" /> -->
                             <div class="flex items-center gap-x-3 text-2xl">
                                 <div class="flex items-center gap-x-1">
-                                    <Icon icon="mdi:like" class="cursor-pointer" :class="{ '!text-blue-500': post.likes.includes(currentUser.uid) }" @click="likePost(post.id)" />
-                                    <p class="text-lg mt-1">{{ post.likes.length }}</p>
+                                    <Icon icon="mdi:like" class="cursor-pointer" :class="{ '!text-blue-500': post.likes?.includes(currentUser.uid) }" @click="likePost(post.id)" />
+                                    <p class="text-lg mt-1">{{ post.likes?.length }}</p>
                                 </div>
                                 <div class="flex items-center gap-x-1">
-                                    <Icon icon="mdi:dislike" class="cursor-pointer" :class="{ '!text-blue-500': post.dislikes.includes(currentUser.uid) }" @click="dislikePost(post.id)" />
-                                    <p class="text-lg mt-1">{{ post.dislikes.length }}</p>
+                                    <Icon icon="mdi:dislike" class="cursor-pointer" :class="{ '!text-blue-500': post.dislikes?.includes(currentUser.uid) }" @click="dislikePost(post.id)" />
+                                    <p class="text-lg mt-1">{{ post.dislikes?.length }}</p>
                                 </div>
                             </div>
                             <!-- <share-network
@@ -116,7 +116,7 @@
 // components
 import newGroupPost from '../components/newGroupPost.vue'
 import editPost from '../components/editPost.vue'
-import comments from '../components/comments.vue'
+import comments from '../components/groupComments.vue'
 import viewImages from '../components/viewPostImages.vue'
 import postSkeletonLoader from '../components/postSkeletonLoader.vue'
 // mods
