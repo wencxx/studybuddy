@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col space-y-5 mb-5 content">
         <h1 class="text-lg capitalize">Top Users</h1>
-        <div class="bg-gray-100/10 p-5 rounded-md space-y-3" @click="selectFilter += 5">
+        <div class="bg-gray-100/10 p-5 rounded-md space-y-3 flex flex-col">
             <h1>Top Collaborators</h1>
             <table class="w-full cursor-pointer">
                 <thead>
@@ -19,8 +19,10 @@
                     </tr>
                 </tbody>    
             </table>
+            <button v-if="topCollaborators.length > selectFilter" class="mx-auto hover:underline"  @click="selectFilter += 100">See more</button>
+            <button v-else class="mx-auto hover:underline"  @click="selectFilter -= 100">See less</button>
         </div>
-        <div class="bg-gray-100/10 p-5 rounded-md space-y-3" @click="filterMostRated += 5">
+        <div class="bg-gray-100/10 p-5 rounded-md space-y-3 flex flex-col">
             <h1>Most Rated</h1>
             <table class="w-full cursor-pointer">
                 <thead>
@@ -38,6 +40,8 @@
                     </tr>
                 </tbody>    
             </table>
+            <button v-if="topRatedUsers.length > filterMostRated" class="mx-auto hover:underline"   @click="filterMostRated += 100">See more</button>
+            <button v-else class="mx-auto hover:underline"  @click="filterMostRated -= 100">See less</button>
         </div>
     </div>
 </template>
@@ -50,13 +54,13 @@ const dataStore = useDataStore()
 const topCollaborators = computed(() => dataStore.topCollaborators)
 const topRatedUsers = computed(() => dataStore.topRatedUsers)
 
-const selectFilter = ref(5)
+const selectFilter = ref(100)
 
 const filteredTopCollaborators = () => {
     return topCollaborators?.value.slice(0, selectFilter.value)
 }
 
-const filterMostRated = ref(5)
+const filterMostRated = ref(100)
 
 const filteredMostRateds = () => {
     return topRatedUsers?.value.slice(0, filterMostRated.value)

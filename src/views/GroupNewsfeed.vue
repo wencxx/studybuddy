@@ -68,9 +68,18 @@
                     <!-- post footer -->
                     <div class="mt-1 flex items-center justify-between gap-x-3">
                         <div class="flex gap-x-1">
-                            <Icon v-if="post.reacts?.includes(currentUser?.uid)" icon="material-symbols-light:favorite"  class="text-red-500 text-2xl dark:text-red-500 cursor-pointer" @click="removeReact(post.id)" />
-                            <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(post.id)" />
-                            <p class="text-sm text-gray-500 cursor-pointer">{{ post.reacts?.length || 0 }}</p>
+                            <!-- <Icon v-if="post.reacts?.includes(currentUser?.uid)" icon="material-symbols-light:favorite"  class="text-red-500 text-2xl dark:text-red-500 cursor-pointer" @click="removeReact(post.id)" />
+                            <Icon v-else icon="material-symbols-light:favorite-outline"  class="text-gray-500 text-2xl dark:text-white cursor-pointer" @click="react(post.id)" /> -->
+                            <div class="flex items-center gap-x-3 text-2xl">
+                                <div class="flex items-center gap-x-1">
+                                    <Icon icon="mdi:like" class="cursor-pointer" :class="{ '!text-blue-500': post.likes.includes(currentUser.uid) }" @click="likePost(post.id)" />
+                                    <p class="text-lg mt-1">{{ post.likes.length }}</p>
+                                </div>
+                                <div class="flex items-center gap-x-1">
+                                    <Icon icon="mdi:dislike" class="cursor-pointer" :class="{ '!text-blue-500': post.dislikes.includes(currentUser.uid) }" @click="dislikePost(post.id)" />
+                                    <p class="text-lg mt-1">{{ post.dislikes.length }}</p>
+                                </div>
+                            </div>
                             <!-- <share-network
                                 network="messenger"
                                 :url="`https://studybuddy-livid.vercel.app/user-details/${post.userId}`"
@@ -286,27 +295,58 @@ const copyToClipboard = async (userId) => {
     }
 }
 
-// react to post
-const react = async (postId) => {
-    const docRef = doc(db, 'posts', postId)
+// like feedback
+const likePost = async (id) => {
+    const currentPost = posts.value.find(post => post.id === id)
+    const isLiked = currentPost.likes?.includes(currentUser.value?.uid) 
     try {
-        await updateDoc(docRef, {
-            reacts: arrayUnion(currentUser.value.uid)
-        })
+        if(isLiked){
+            await updateDoc(
+                doc(db, 'posts', id),
+                {
+                    likes: arrayRemove(currentUser.value?.uid)
+                }
+            )   
+        }else{
+            await updateDoc(
+                doc(db, 'posts', id),
+                {
+                    likes: arrayUnion(currentUser.value?.uid),
+                    dislikes: arrayRemove(currentUser.value?.uid)
+                }
+            )   
+        }
+        
     } catch (error) {
         console.log(error)
-    } 
+    }
 }
 
-const removeReact = async (postId) => {
-    const docRef = doc(db, 'posts', postId)
+// dislike feedback
+const dislikePost = async (id) => {
+    const currentPost = posts.value.find(post => post.id === id)
+    const isDisliked = currentPost.dislikes?.includes(currentUser.value?.uid) 
     try {
-        await updateDoc(docRef, {
-            reacts: arrayRemove(currentUser.value.uid)
-        })
+        if(isDisliked){
+            await updateDoc(
+                doc(db, 'posts', id),
+                {
+                    dislikes: arrayRemove(currentUser.value?.uid)
+                }
+            )   
+        }else{
+            await updateDoc(
+                doc(db, 'posts', id),
+                {
+                    dislikes: arrayUnion(currentUser.value?.uid),
+                    likes: arrayRemove(currentUser.value?.uid)
+                }
+            )   
+        }
+        
     } catch (error) {
         console.log(error)
-    } 
+    }
 }
 
 getPosts()

@@ -123,6 +123,7 @@ const postDetails = ref('')
 const posting = ref(false)
 
 const filter = new Filter();
+filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil')
 
 const post = async () => {
     const imageUrls = []
@@ -159,7 +160,9 @@ const post = async () => {
         name: currentUser.value.displayName,
         photoURL: currentUser.value.photoURL,
         postedAt: Timestamp.now(),
-        group: group
+        group: group,
+        likes: [],
+        dislikes: []
       });
       
       postDetails.value = ''
