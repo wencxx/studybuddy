@@ -80,6 +80,10 @@
             <label>Question</label>
             <input type="text" class="border border-gray-300 rounded pl-2 h-8" v-model="question">
         </div>
+        <div class="flex flex-col gap-y-1 w-2/3">
+            <label>Attach Image</label>
+            <input type="file" accept=".jpg, .jpeg, .png" class="rounded pl-2 h-8" @change="attachImage">
+        </div>
         <div v-if="quizAddedType === 'mc'" class="w-2/3">
             <div class="flex items-center justify-between">
                 <p>Choices</p>
@@ -120,8 +124,9 @@
 
 <script setup>
 import { ref, defineEmits, computed } from 'vue'
-import { db } from '../plugins/firebase'
+import { db, storage } from '../plugins/firebase'
 import { collection, addDoc } from 'firebase/firestore'
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useAuthStore } from '../store'
 
 const authStore = useAuthStore()
@@ -134,19 +139,21 @@ const closeModal = () => {
     emits('closeModal')
 }
 
-// check duee date if less than todays date
+// Check due date if less than today's date
 const invalidDueDate = ref(false)
 
 const checkDueDate = () => {
     const dateNow = new Date()
     const dateToString = dateNow.toISOString().split('T')[0]
 
-    if(dueDate.value < dateToString) return invalidDueDate.value = true
+    if (dueDate.value < dateToString) {
+        invalidDueDate.value = true
+        return
+    }
     invalidDueDate.value = false
 }
 
-
-// add new quiz
+// Quiz details
 const quizTitle = ref('')
 const dueDate = ref('')
 const quizAddedType = ref('')
@@ -155,52 +162,70 @@ const privacy = ref('')
 const question = ref('')
 const choices = ref([])
 const answer = ref('')
-
-
 const addedItem = ref(false)
-
 const quizzes = ref([])
 
-// add item/show quiz details
+// Image upload
+const imageFile = ref(null) // For storing selected image
+const imageUrl = ref('') // For storing uploaded image URL
+
+const attachImage = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const storagePath = `quiz-images/${file.name}`
+    const imageStorageRef = storageRef(storage, storagePath)
+
+    try {
+        await uploadBytes(imageStorageRef, file)
+        const url = await getDownloadURL(imageStorageRef)
+        imageUrl.value = url // Save the image URL
+        console.log('Image uploaded successfully:', url)
+    } catch (error) {
+        console.error('Error uploading image:', error)
+    }
+}
+
+// Add item/show quiz details
 const addItem = (type) => {
     addedItem.value = true
     quizAddedType.value = type
 }
 
-// add choices if multiple choice
+// Add choices if multiple choice
 const choiceToAdd = ref('')
-
 const showAddChoice = ref(false)
 
-// show add chouce input
+// Show add choice input
 const addChoices = () => {
     showAddChoice.value = true
 }
 
-// close the addchoice input
+// Close the add choice input
 const closeAddChoices = () => {
     showAddChoice.value = false
     choiceToAdd.value = ''
 }
 
-// add choice
+// Add choice
 const addChoice = () => {
     choices.value.push(choiceToAdd.value)
     choiceToAdd.value = ''
 }
 
-// remove added choice
+// Remove added choice
 const removeChoice = (index) => {
     choices.value.splice(index, 1)
 }
 
-// add quiz to quizzes
+// Add quiz to quizzes
 const addQuiz = () => {
     quizzes.value.push({
         quizType: quizAddedType.value,
         question: question.value,
         choices: choices.value,
         answer: answer.value,
+        imageUrl: imageUrl.value // Include image URL in quiz data
     })
 
     addedItem.value = false
@@ -208,10 +233,10 @@ const addQuiz = () => {
     question.value = ''
     answer.value = ''
     choices.value = []
+    imageUrl.value = '' // Reset image URL for next quiz
 }
 
-
-// add to databas
+// Add to database
 const adding = ref(false)
 const quizRef = collection(db, 'quizzes')
 
@@ -225,7 +250,7 @@ const submitQuiz = async () => {
             dueDate: dueDate.value,
             quizzes: quizzes.value,
             status: 'To do',
-            userId:  currentUser.value.uid
+            userId: currentUser.value.uid
         })
 
         closeModal()
@@ -244,10 +269,12 @@ const submitQuiz = async () => {
         dueDate.value = ''
         adding.value = false
     } catch (error) {
-        console.log(error)
+        console.log('Error submitting quiz:', error)
+        adding.value = false
     }
 }
 </script>
+
 
 <style scoped>
 #quizList::-webkit-scrollbar {

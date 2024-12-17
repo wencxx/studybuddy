@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="basta">
         <div v-if="!loadingQuiz" class="relative">
             <h1 class="text-xl font-semibold">Quiz title: <span class="capitalize font-normal">{{ quiz.quizTitle }}</span></h1>
             <h1 class="text-sm mt-1">Due date: <span class="capitalize font-normal">{{ formatQuizDueDate(quiz.dueDate) }}</span></h1>
@@ -8,6 +8,7 @@
                 <div v-for="(quiz, index) in quiz.quizzes" :key="index" class="space-y-2">
                     <!-- question -->
                     <p class="text-lg">{{ index + 1 }}. {{ quiz.question }}</p>
+                    <img :src="quiz.imageUrl" alt="quiz image" class="w-1/2 aspect-square cursor-pointer" @click="viewImage(quiz.imageUrl)">
                     <!-- answer base on item typee -->
                     <div v-if="quiz.quizType === 'mc'" class="flex flex-wrap gap-7 pl-5">
                         <div v-for="choice in quiz.choices" :key="choice" class="flex items-center gap-x-2">
@@ -80,6 +81,14 @@
                     <router-link :to="{ name: 'quiz' }" class="bg-blue-500 w-full lg:w-1/2 rounded text-white text-center">Done</router-link>
                 </div>
             </div>
+        </div>
+
+        <!-- view image -->
+        <div class="w-screen h-screen flex items-center justify-center bg-black/10 fixed top-0 left-0 z-20 px-10" v-if="showImageModal">
+            <div class="absolute top-5 right-5 p-2 bg-gray-100 rounded-full cursor-pointer" @click="showImageModal = false">
+                <Icon icon="mdi:close" class="text-black" />
+            </div>
+            <img :src="imageToView" alt="quiz image" class="w-full max-w-3xl h-2/4 md:h-[90dvh]">
         </div>
     </div>
 </template>
@@ -235,11 +244,20 @@ const rate = async (rating) => {
     }
 }
 
+const imageToView = ref('')
+const showImageModal = ref(false)
+
+const viewImage = (imageUrl) => {
+    imageToView.value = imageUrl
+    showImageModal.value = true
+}
 onMounted(() => {
     getQuiz()
 })
 </script>
 
 <style scoped>
-
+.basta::-webkit-scrollbar {
+    display: none;
+}
 </style>
