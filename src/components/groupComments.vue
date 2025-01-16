@@ -180,6 +180,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useAuthStore } from '../store'
 import { db } from '../plugins/firebase'
 import { collection, addDoc, Timestamp, query, where, orderBy, onSnapshot, limit, getCountFromServer, doc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore'
+import { Filter } from 'bad-words'
 
 const authStore = useAuthStore()
 
@@ -223,6 +224,9 @@ const commRefs = collection(db, 'comments')
 // add comment
 const comment = ref('')
 
+const filter = new Filter();
+filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil', 'bilat', 'pitoy')
+
 const addComment = async (postId) => {
 
     if(!comment.value) return
@@ -230,7 +234,7 @@ const addComment = async (postId) => {
     try {
         const res = await addDoc(commRefs, {
             postId: postId,
-            comment: comment.value,
+            comment: filter.clean(comment.value),
             name: currentUser.value.displayName,
             photoURL: currentUser.value.photoURL,
             commentedAt: Timestamp.now(),
@@ -258,7 +262,7 @@ const addReply = async (commentId) => {
     try {
         // addingReply.value = true
         const res = await addDoc(replyRef, {
-            reply: reply.value,
+            reply: filter.clean(reply.value),
             commentId: commentId,
             name: currentUser.value.displayName,
             photoURL: currentUser.value.photoURL,

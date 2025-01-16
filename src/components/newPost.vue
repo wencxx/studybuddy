@@ -121,7 +121,7 @@ const postDetails = ref('')
 const posting = ref(false)
 
 const filter = new Filter();
-filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil')
+filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil', 'bilat', 'pitoy')
 
 const post = async () => {
 
