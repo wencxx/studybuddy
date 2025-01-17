@@ -202,7 +202,7 @@ const commRefs = collection(db, 'comments')
 const comment = ref('')
 
 const filter = new Filter();
-filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil', 'bilat', 'pitoy')
+filter.addWords('yawa', 'buang', 'ulol', 'gago', 'gaga', 'linti', 'buysit', 'bweset', 'putangina', 'tangina', 'tanga', 'bobo', 'pota', 'dipota', 'inutil', 'bilat', 'pitoy', 'monay', 'buto', 'boto')
 
 const addComment = async (postId) => {
 
